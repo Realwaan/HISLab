@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Clinikabayan HIS</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-small">
+                <img src="../assets/logo.png" alt="Clinikabayan Logo" class="logo-image-small">
+            </div>
+            <h3>Clinikabayan</h3>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="primary-care.html" class="nav-item">
+                <i class="fas fa-heartbeat"></i>
+                <span>Primary Care</span>
+            </a>
+            <a href="transport-referral.html" class="nav-item">
+                <i class="fas fa-ambulance"></i>
+                <span>Transport & Referral</span>
+            </a>
+            <a href="health-campaigns.html" class="nav-item">
+                <i class="fas fa-bullhorn"></i>
+                <span>Health Campaigns</span>
+            </a>
+            <a href="reports.html" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <p class="user-name" id="userName">Admin User</p>
+                    <p class="user-role">Administrator</p>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="btn-menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Dashboard</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search patients, records...">
+                </div>
+                <button class="btn-notifications" onclick="toggleNotifications()">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationCount">3</span>
+                </button>
+                
+                <!-- Notifications Dropdown -->
+                <div class="notifications-dropdown" id="notificationsDropdown">
+                    <div class="notifications-header">
+                        <h3><i class="fas fa-bell"></i> Notifications</h3>
+                        <button class="btn-mark-read" onclick="markAllAsRead()">
+                            <i class="fas fa-check-double"></i> Mark all as read
+                        </button>
+                    </div>
+                    <div class="notifications-list">
+                        <div class="notification-item unread">
+                            <div class="notification-icon" style="background: #FF00FF;">
+                                <i class="fas fa-flask"></i>
+                            </div>
+                            <div class="notification-content">
+                                <h4>New Laboratory Requests</h4>
+                                <p>3 new laboratory test requests pending</p>
+                                <span class="notification-time">2 minutes ago</span>
+                            </div>
+                        </div>
+                        <div class="notification-item unread">
+                            <div class="notification-icon" style="background: #F44336;">
+                                <i class="fas fa-ambulance"></i>
+                            </div>
+                            <div class="notification-content">
+                                <h4>Urgent Transport Request</h4>
+                                <p>Emergency transport needed for patient Santos, Maria</p>
+                                <span class="notification-time">15 minutes ago</span>
+                            </div>
+                        </div>
+                        <div class="notification-item unread">
+                            <div class="notification-icon" style="background: #4CAF50;">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="notification-content">
+                                <h4>New Patient Admission</h4>
+                                <p>Patient Garcia, Pedro has been admitted</p>
+                                <span class="notification-time">1 hour ago</span>
+                            </div>
+                        </div>
+                        <div class="notification-item">
+                            <div class="notification-icon" style="background: #2196F3;">
+                                <i class="fas fa-bullhorn"></i>
+                            </div>
+                            <div class="notification-content">
+                                <h4>Health Campaign Update</h4>
+                                <p>Vaccination drive scheduled for tomorrow</p>
+                                <span class="notification-time">3 hours ago</span>
+                            </div>
+                        </div>
+                        <div class="notification-item">
+                            <div class="notification-icon" style="background: #FFC107;">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="notification-content">
+                                <h4>Low Inventory Alert</h4>
+                                <p>Medical supplies running low - restock needed</p>
+                                <span class="notification-time">5 hours ago</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notifications-footer">
+                        <a href="#" class="btn-view-all">View All Notifications</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-container">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <div class="welcome-text">
+                    <h2>Welcome back, <span id="welcomeName">Admin</span>!</h2>
+                    <p>Here's what's happening with your healthcare services today.</p>
+                </div>
+                <div class="welcome-date">
+                    <i class="fas fa-calendar"></i>
+                    <span id="currentDate"></span>
+                </div>
+            </div>
+
+            <!-- Key Performance Indicators -->
+            <div class="kpi-section">
+                <h3 class="section-title">Key Performance Indicators</h3>
+                <div class="kpi-grid">
+                    <!-- Total Patients -->
+                    <div class="kpi-card">
+                        <div class="kpi-icon primary">
+                            <i class="fas fa-user-injured"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <p class="kpi-label">Total Patients</p>
+                            <h3 class="kpi-value">2,847</h3>
+                            <p class="kpi-change positive">
+                                <i class="fas fa-arrow-up"></i> 12% from last month
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Active Volunteers -->
+                    <div class="kpi-card">
+                        <div class="kpi-icon success">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <p class="kpi-label">Active Volunteers</p>
+                            <h3 class="kpi-value">87</h3>
+                            <p class="kpi-change positive">
+                                <i class="fas fa-arrow-up"></i> 5 new this week
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Pending Referrals -->
+                    <div class="kpi-card">
+                        <div class="kpi-icon warning">
+                            <i class="fas fa-hospital-alt"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <p class="kpi-label">Pending Referrals</p>
+                            <h3 class="kpi-value">15</h3>
+                            <p class="kpi-change">
+                                <i class="fas fa-clock"></i> Requires attention
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Campaigns -->
+                    <div class="kpi-card">
+                        <div class="kpi-icon accent">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <p class="kpi-label">Upcoming Campaigns</p>
+                            <h3 class="kpi-value">8</h3>
+                            <p class="kpi-change">
+                                <i class="fas fa-calendar"></i> Next: Dec 1, 2025
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="quick-links-section">
+                <h3 class="section-title">Quick Actions</h3>
+                <div class="quick-links-grid">
+                    <a href="primary-care.html" class="quick-link-card">
+                        <div class="quick-link-artwork">
+                            <i class="fas fa-user-md"></i>
+                            <i class="fas fa-heartbeat"></i>
+                            <i class="fas fa-notes-medical"></i>
+                        </div>
+                        <div class="quick-link-icon primary">
+                            <i class="fas fa-stethoscope"></i>
+                        </div>
+                        <h4>Primary Care Services</h4>
+                        <p>Manage patient records, consultations, and medical services</p>
+                    </a>
+
+                    <a href="transport-referral.html" class="quick-link-card">
+                        <div class="quick-link-artwork">
+                            <i class="fas fa-ambulance"></i>
+                            <i class="fas fa-hospital"></i>
+                            <i class="fas fa-road"></i>
+                        </div>
+                        <div class="quick-link-icon success">
+                            <i class="fas fa-ambulance"></i>
+                        </div>
+                        <h4>Transport & Referral</h4>
+                        <p>Schedule transports and manage hospital referrals</p>
+                    </a>
+
+                    <a href="health-campaigns.html" class="quick-link-card">
+                        <div class="quick-link-artwork">
+                            <i class="fas fa-users"></i>
+                            <i class="fas fa-bullhorn"></i>
+                            <i class="fas fa-syringe"></i>
+                        </div>
+                        <div class="quick-link-icon accent">
+                            <i class="fas fa-hand-holding-medical"></i>
+                        </div>
+                        <h4>Health Education Campaigns</h4>
+                        <p>Plan and track community health awareness programs</p>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Activity Feed & Recent Updates -->
+            <div class="bottom-section">
+                <div class="activity-feed">
+                    <div class="activity-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-stream"></i> Live Activity Feed
+                            <span class="activity-pulse"></span>
+                        </h3>
+                        <span class="activity-count">5 new activities</span>
+                    </div>
+                    <div class="activity-list">
+                        <div class="activity-item new-item">
+                            <div class="activity-icon-wrapper">
+                                <div class="activity-icon primary">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div class="activity-connector"></div>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-main">
+                                    <span class="activity-badge new">NEW</span>
+                                    <p class="activity-title">New Patient Registered</p>
+                                </div>
+                                <p class="activity-detail">
+                                    <i class="fas fa-user-circle"></i> Maria Santos, Age 34
+                                    <span class="activity-location"><i class="fas fa-map-marker-alt"></i> Barangay San Jose</span>
+                                </p>
+                                <div class="activity-footer">
+                                    <p class="activity-time"><i class="far fa-clock"></i> 15 minutes ago</p>
+                                    <span class="activity-action">View Profile →</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon-wrapper">
+                                <div class="activity-icon success">
+                                    <i class="fas fa-ambulance"></i>
+                                </div>
+                                <div class="activity-connector"></div>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-main">
+                                    <span class="activity-badge success">COMPLETED</span>
+                                    <p class="activity-title">Referral Completed</p>
+                                </div>
+                                <p class="activity-detail">
+                                    <i class="fas fa-user-circle"></i> Juan Reyes
+                                    <span class="activity-location"><i class="fas fa-hospital"></i> Cebu City Medical Center</span>
+                                </p>
+                                <div class="activity-footer">
+                                    <p class="activity-time"><i class="far fa-clock"></i> 1 hour ago</p>
+                                    <span class="activity-action">View Details →</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon-wrapper">
+                                <div class="activity-icon accent">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <div class="activity-connector"></div>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-main">
+                                    <span class="activity-badge scheduled">SCHEDULED</span>
+                                    <p class="activity-title">Health Campaign Scheduled</p>
+                                </div>
+                                <p class="activity-detail">
+                                    <i class="fas fa-bullhorn"></i> Dengue Awareness Program
+                                    <span class="activity-location"><i class="fas fa-map-marker-alt"></i> Barangay Luz</span>
+                                </p>
+                                <div class="activity-footer">
+                                    <p class="activity-time"><i class="far fa-clock"></i> 2 hours ago</p>
+                                    <span class="activity-action">View Campaign →</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon-wrapper">
+                                <div class="activity-icon success">
+                                    <i class="fas fa-syringe"></i>
+                                </div>
+                                <div class="activity-connector"></div>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-main">
+                                    <span class="activity-badge success">SUCCESS</span>
+                                    <p class="activity-title">Vaccination Drive Completed</p>
+                                </div>
+                                <p class="activity-detail">
+                                    <i class="fas fa-users"></i> 45 children vaccinated
+                                    <span class="activity-location"><i class="fas fa-map-marker-alt"></i> Sitio Maharlika</span>
+                                </p>
+                                <div class="activity-footer">
+                                    <p class="activity-time"><i class="far fa-clock"></i> 4 hours ago</p>
+                                    <span class="activity-action">View Report →</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon-wrapper">
+                                <div class="activity-icon warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="activity-connector last"></div>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-main">
+                                    <span class="activity-badge warning">ALERT</span>
+                                    <p class="activity-title">Low Inventory Alert</p>
+                                </div>
+                                <p class="activity-detail">
+                                    <i class="fas fa-box"></i> Medical supplies running low
+                                    <span class="activity-location"><i class="fas fa-exclamation-circle"></i> Restock needed</span>
+                                </p>
+                                <div class="activity-footer">
+                                    <p class="activity-time"><i class="far fa-clock"></i> 5 hours ago</p>
+                                    <span class="activity-action">View Inventory →</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-view-all-activity">
+                        <i class="fas fa-history"></i> View All Activity
+                    </button>
+                </div>
+
+                <!-- Right Sidebar Panel -->
+                <div class="right-sidebar-panel">
+                    <!-- Quick Stats Widget -->
+                    <div class="quick-stats-widget">
+                        <h3 class="widget-title">
+                            <i class="fas fa-tachometer-alt"></i> Quick Stats
+                        </h3>
+                        <div class="stats-list">
+                            <div class="stat-item">
+                                <div class="stat-icon patients">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Today's Patients</span>
+                                    <span class="stat-value">28</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon appointments">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Appointments</span>
+                                    <span class="stat-value">12</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon volunteers">
+                                    <i class="fas fa-hand-holding-medical"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Active Volunteers</span>
+                                    <span class="stat-value">15</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Tasks Widget -->
+                    <div class="upcoming-tasks-widget">
+                        <h3 class="widget-title">
+                            <i class="fas fa-tasks"></i> Upcoming Tasks
+                        </h3>
+                        <div class="tasks-list">
+                            <div class="task-item priority-high">
+                                <div class="task-checkbox">
+                                    <input type="checkbox" id="task1" onclick="toggleTask(this)">
+                                    <label for="task1"></label>
+                                </div>
+                                <div class="task-content">
+                                    <p class="task-title">Review pending lab results</p>
+                                    <p class="task-time"><i class="fas fa-clock"></i> Due in 2 hours</p>
+                                </div>
+                            </div>
+                            <div class="task-item priority-medium">
+                                <div class="task-checkbox">
+                                    <input type="checkbox" id="task2" onclick="toggleTask(this)">
+                                    <label for="task2"></label>
+                                </div>
+                                <div class="task-content">
+                                    <p class="task-title">Prepare medical supplies for mission</p>
+                                    <p class="task-time"><i class="fas fa-clock"></i> Tomorrow, 8:00 AM</p>
+                                </div>
+                            </div>
+                            <div class="task-item priority-medium">
+                                <div class="task-checkbox">
+                                    <input type="checkbox" id="task3" onclick="toggleTask(this)">
+                                    <label for="task3"></label>
+                                </div>
+                                <div class="task-content">
+                                    <p class="task-title">Follow-up with referral patients</p>
+                                    <p class="task-time"><i class="fas fa-clock"></i> Tomorrow, 2:00 PM</p>
+                                </div>
+                            </div>
+                            <div class="task-item priority-low">
+                                <div class="task-checkbox">
+                                    <input type="checkbox" id="task4" onclick="toggleTask(this)">
+                                    <label for="task4"></label>
+                                </div>
+                                <div class="task-content">
+                                    <p class="task-title">Update inventory records</p>
+                                    <p class="task-time"><i class="fas fa-clock"></i> This week</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-add-task" onclick="addNewTask()">
+                            <i class="fas fa-plus"></i> Add Task
+                        </button>
+                    </div>
+
+                    <!-- Notifications Panel -->
+                    <div class="notifications-panel">
+                        <h3 class="widget-title">
+                            <i class="fas fa-bell"></i> Notifications
+                            <span class="notification-count">3</span>
+                        </h3>
+                        <div class="notification-list">
+                            <div class="notification-item urgent">
+                                <div class="notification-icon urgent">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <p class="notification-text"><strong>3 pending referrals</strong> require approval</p>
+                                    <p class="notification-time">Just now</p>
+                                </div>
+                            </div>
+
+                            <div class="notification-item">
+                                <div class="notification-icon info">
+                                    <i class="fas fa-calendar"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <p class="notification-text"><strong>Medical mission</strong> scheduled tomorrow</p>
+                                    <p class="notification-detail">Barangay Talamban, 8:00 AM</p>
+                                    <p class="notification-time">Today, 9:30 AM</p>
+                                </div>
+                            </div>
+
+                            <div class="notification-item">
+                                <div class="notification-icon success">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <p class="notification-text"><strong>5 volunteers</strong> completed training</p>
+                                    <p class="notification-detail">Ready for field deployment</p>
+                                    <p class="notification-time">Yesterday, 4:15 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-view-all">
+                            <i class="fas fa-arrow-right"></i> View All
+                        </button>
+                    </div>
+
+                    <!-- Weather Widget -->
+                    <div class="weather-widget">
+                        <h3 class="widget-title">
+                            <i class="fas fa-cloud-sun"></i> Weather Today
+                        </h3>
+                        <div class="weather-content">
+                            <div class="weather-main">
+                                <div class="weather-icon">
+                                    <i class="fas fa-sun"></i>
+                                </div>
+                                <div class="weather-temp">
+                                    <span class="temp-value">29°</span>
+                                    <span class="temp-unit">C</span>
+                                </div>
+                            </div>
+                            <div class="weather-details">
+                                <p class="weather-condition">Partly Cloudy</p>
+                                <p class="weather-location"><i class="fas fa-map-marker-alt"></i> Cebu City</p>
+                                <div class="weather-info-row">
+                                    <span><i class="fas fa-tint"></i> Humidity: 75%</span>
+                                    <span><i class="fas fa-wind"></i> Wind: 12 km/h</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="weather-alert">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Good weather for outdoor health campaigns</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pending Requests Modal -->
+    <div id="pendingRequestsModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closePendingRequests()"></div>
+        <div class="modal-content pending-requests-modal">
+            <div class="pending-header">
+                <div class="pending-title-bar">
+                    <span class="pending-icon">📋</span>
+                    <span class="pending-title">Pending Request</span>
+                    <button class="pending-close" onclick="closePendingRequests()">✕</button>
+                </div>
+                <div class="pending-subtitle">
+                    <i class="fas fa-bell"></i> Latest incoming request(s)...
+                </div>
+            </div>
+            
+            <div class="pending-body">
+                <div class="pending-table-wrapper">
+                    <table class="pending-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Type / Req D/T</th>
+                                <th>Req. No</th>
+                                <th>Acct No</th>
+                                <th>Station</th>
+                                <th>Acct. Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr onclick="selectRequest(this)">
+                                <td>SANTOS, MARIA LIM</td>
+                                <td>WBCP - 2025-11-25 09:30</td>
+                                <td>235181</td>
+                                <td>2023-2</td>
+                                <td>VELEZCOL</td>
+                                <td>IPD ACC</td>
+                            </tr>
+                            <tr onclick="selectRequest(this)">
+                                <td>CHIU, JAELLE III RONA</td>
+                                <td>IPD - 2023-12-13 15:09</td>
+                                <td>233113</td>
+                                <td>2023-2</td>
+                                <td>VELEZCOL</td>
+                                <td>IPD ACC</td>
+                            </tr>
+                            <tr onclick="selectRequest(this)">
+                                <td>SALAZAR, JAMES CO</td>
+                                <td>IPD - 2024-10-29 16:33</td>
+                                <td>242191#</td>
+                                <td>2024-11</td>
+                                <td>VELEZCOL</td>
+                                <td>IPD ACC</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pending-total">
+                        TOTAL PENDING >>> <span id="pendingCount">3</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pending-footer">
+                <div class="pending-info">
+                    <div class="info-icon">💡</div>
+                    <div class="info-text">
+                        <strong>Click me</strong> above for the<br>
+                        next 1 minute
+                    </div>
+                </div>
+                <div class="pending-actions">
+                    <textarea class="pending-remarks" placeholder="Description"></textarea>
+                    <button class="btn-process" onclick="processPendingRequest()">
+                        <i class="fas fa-play"></i> Process Pending
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Laboratory Request Items/Services Modal -->
+    <div id="labRequestModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeLabRequest()"></div>
+        <div class="modal-content lab-request-modal">
+            <div class="lab-request-header">
+                <div class="lab-title-bar">
+                    <span class="lab-icon">🧪</span>
+                    <span class="lab-title">LABORATORY REQUEST</span>
+                    <button class="lab-close" onclick="closeLabRequest()">✕</button>
+                </div>
+                <div class="lab-patient-info">
+                    <div class="patient-name" id="labPatientName">SALAZAR, JAMES CO</div>
+                    <div class="patient-details-row">
+                        <span><strong>Req. Code:</strong> <span id="labReqCode">2421914</span></span>
+                        <span><strong>Age:</strong> <span id="labAge">68</span></span>
+                        <span><strong>Gender:</strong> <span id="labGender">Male</span></span>
+                        <span><strong>LBS:</strong> <span id="labLbs">0.00</span></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lab-request-body">
+                <div class="lab-form-section">
+                    <div class="lab-form-group">
+                        <label>Address</label>
+                        <input type="text" id="labAddress" value="#21 FLOWER STREET - CEBU CITY" readonly>
+                    </div>
+                    
+                    <div class="lab-form-row">
+                        <div class="lab-form-group">
+                            <label>Birthday</label>
+                            <input type="date" id="labBirthday" value="2025-05-29" readonly>
+                        </div>
+                        <div class="lab-form-group">
+                            <label>Contact No.</label>
+                            <input type="text" id="labContact" value="09090909093" readonly>
+                        </div>
+                    </div>
+
+                    <div class="lab-form-row">
+                        <div class="lab-form-group">
+                            <label>Result Transmittal</label>
+                            <select id="labTransmittal">
+                                <option>Pick-up</option>
+                                <option>Email</option>
+                                <option>SMS</option>
+                            </select>
+                        </div>
+                        <div class="lab-form-group">
+                            <label>Patient Location</label>
+                            <select id="labLocation">
+                                <option>231 - 1-BEDSIDE</option>
+                                <option>ER</option>
+                                <option>OPD</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="lab-form-row">
+                        <div class="lab-form-group">
+                            <label>Change Type</label>
+                            <select id="labChangeType">
+                                <option>CTA</option>
+                                <option>Cash</option>
+                            </select>
+                        </div>
+                        <div class="lab-form-group">
+                            <label>Insurance / HMO</label>
+                            <select id="labInsurance">
+                                <option value="">Select Insurance</option>
+                                <option>PhilHealth</option>
+                                <option>HMO</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="lab-form-group">
+                        <label>Doctor / Physician</label>
+                        <input type="text" id="labDoctor" value="CRISOLO, MARIA VIRGINIA MD-JACOB" readonly>
+                    </div>
+                </div>
+
+                <div class="lab-tests-section">
+                    <div class="lab-section-header">
+                        <h4><i class="fas fa-flask"></i> Request Items / Services</h4>
+                        <button class="btn-add-test" onclick="addLabTest()">
+                            <i class="fas fa-plus"></i> Add Test
+                        </button>
+                    </div>
+                    
+                    <table class="lab-tests-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Description</th>
+                                <th>Qty</th>
+                                <th>Unit</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="labTestsTableBody">
+                            <tr>
+                                <td>1</td>
+                                <td><strong>URINALYSIS</strong></td>
+                                <td>1</td>
+                                <td>Manual</td>
+                                <td>₱202.00</td>
+                                <td><button class="btn-remove-test" onclick="removeLabTest(this)"><i class="fas fa-trash"></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="lab-total-section">
+                        <div class="lab-total-row">
+                            <span>Subtotal:</span>
+                            <span id="labSubtotal">₱202.00</span>
+                        </div>
+                        <div class="lab-total-row">
+                            <span>Discount:</span>
+                            <span id="labDiscount">₱0.00</span>
+                        </div>
+                        <div class="lab-total-row total">
+                            <strong>Total:</strong>
+                            <strong id="labTotal">₱202.00</strong>
+                        </div>
+                    </div>
+
+                    <div class="lab-notes-section">
+                        <label>Tag lines for Report:</label>
+                        <textarea id="labNotes" rows="3" placeholder="Enter any special instructions or notes..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lab-request-footer">
+                <div class="lab-footer-info">
+                    <p><strong>Requested by:</strong> <span id="labRequestedBy">Oct 29, 24 at 04:33 pm</span></p>
+                    <p><strong>Transaction Code:</strong> <span id="labTransCode">10352416351513-11IFc</span></p>
+                </div>
+                <div class="lab-footer-actions">
+                    <button class="btn-save-later" onclick="saveLabRequestLater()">
+                        <i class="fas fa-save"></i> Save Later
+                    </button>
+                    <button class="btn-item-not-available" onclick="itemNotAvailable()">
+                        <i class="fas fa-times-circle"></i> Item Not Available
+                    </button>
+                    <button class="btn-request-payment" onclick="requestPayment()">
+                        <i class="fas fa-money-bill"></i> Request Payment
+                    </button>
+                    <button class="btn-revoke-tag" onclick="revokeTag()">
+                        <i class="fas fa-undo"></i> Revoke Tag Item
+                    </button>
+                    <button class="btn-proceed" onclick="proceedToTransactions()">
+                        <i class="fas fa-arrow-right"></i> Proceed to Transactions
+                    </button>
+                    <button class="btn-print" onclick="printLabRequest()">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                    <button class="btn-cancel" onclick="closeLabRequest()">
+                        <i class="fas fa-ban"></i> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

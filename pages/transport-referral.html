@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transport & Referral - Clinikabayan HIS</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/transport-referral.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-small">
+                <img src="../assets/logo.png" alt="Clinikabayan Logo" class="logo-image-small">
+            </div>
+            <h3>Clinikabayan</h3>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="primary-care.html" class="nav-item">
+                <i class="fas fa-heartbeat"></i>
+                <span>Primary Care</span>
+            </a>
+            <a href="transport-referral.html" class="nav-item active">
+                <i class="fas fa-ambulance"></i>
+                <span>Transport & Referral</span>
+            </a>
+            <a href="health-campaigns.html" class="nav-item">
+                <i class="fas fa-bullhorn"></i>
+                <span>Health Campaigns</span>
+            </a>
+            <a href="reports.html" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <p class="user-name" id="userName">Admin User</p>
+                    <p class="user-role">Administrator</p>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="btn-menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Transport & Referral Services</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="btn btn-primary" id="btnNewRequest">
+                    <i class="fas fa-plus"></i> New Transport Request
+                </button>
+            </div>
+        </header>
+
+        <!-- Transport Content -->
+        <div class="dashboard-container">
+            <!-- Tabs Navigation -->
+            <div class="tabs-container">
+                <button class="tab-btn active" data-tab="requests">
+                    <i class="fas fa-ambulance"></i> Active Requests
+                </button>
+                <button class="tab-btn" data-tab="referrals">
+                    <i class="fas fa-file-medical-alt"></i> Referrals
+                </button>
+                <button class="tab-btn" data-tab="vehicles">
+                    <i class="fas fa-truck-medical"></i> Vehicles & Drivers
+                </button>
+                <button class="tab-btn" data-tab="history">
+                    <i class="fas fa-clock"></i> History
+                </button>
+            </div>
+
+            <!-- Active Requests Tab -->
+            <div class="tab-content active" id="requestsTab">
+                <div class="content-header">
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchRequests" placeholder="Search transport requests...">
+                    </div>
+                    <div class="filter-buttons">
+                        <button class="btn-filter active" data-status="all">All</button>
+                        <button class="btn-filter" data-status="pending">Pending</button>
+                        <button class="btn-filter" data-status="assigned">Assigned</button>
+                        <button class="btn-filter" data-status="in-transit">In Transit</button>
+                        <button class="btn-filter" data-status="completed">Completed</button>
+                    </div>
+                </div>
+
+                <div class="requests-grid">
+                    <!-- Request Card 1 -->
+                    <div class="request-card" data-status="pending">
+                        <div class="request-header">
+                            <div class="request-id">
+                                <span class="label">Request ID:</span>
+                                <span class="value">#TR-2025-001</span>
+                            </div>
+                            <span class="status-badge status-pending">Pending</span>
+                        </div>
+                        <div class="request-body">
+                            <div class="patient-info">
+                                <h4><i class="fas fa-user-injured"></i> Maria Santos</h4>
+                                <p class="text-secondary">Age: 67 | Female</p>
+                            </div>
+                            <div class="transport-details">
+                                <div class="detail-row">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <div>
+                                        <strong>From:</strong> Barangay San Isidro Health Center
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-hospital"></i>
+                                    <div>
+                                        <strong>To:</strong> Cebu Provincial Hospital
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-notes-medical"></i>
+                                    <div>
+                                        <strong>Reason:</strong> Severe chest pain, possible cardiac event
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-clock"></i>
+                                    <div>
+                                        <strong>Requested:</strong> Nov 25, 2025 - 2:30 PM
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <div>
+                                        <strong>Priority:</strong> <span class="priority-high">HIGH - Emergency</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="request-footer">
+                            <button class="btn btn-primary btn-sm" onclick="assignDriver('TR-2025-001')">
+                                <i class="fas fa-user-check"></i> Assign Driver
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="viewDetails('TR-2025-001')">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Request Card 2 -->
+                    <div class="request-card" data-status="assigned">
+                        <div class="request-header">
+                            <div class="request-id">
+                                <span class="label">Request ID:</span>
+                                <span class="value">#TR-2025-002</span>
+                            </div>
+                            <span class="status-badge status-assigned">Assigned</span>
+                        </div>
+                        <div class="request-body">
+                            <div class="patient-info">
+                                <h4><i class="fas fa-user-injured"></i> Juan Dela Cruz</h4>
+                                <p class="text-secondary">Age: 45 | Male</p>
+                            </div>
+                            <div class="transport-details">
+                                <div class="detail-row">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <div>
+                                        <strong>From:</strong> Clinikabayan Mobile Unit - Talisay
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-hospital"></i>
+                                    <div>
+                                        <strong>To:</strong> Vicente Sotto Memorial Medical Center
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-notes-medical"></i>
+                                    <div>
+                                        <strong>Reason:</strong> Diabetes management, require specialist consultation
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-user-md"></i>
+                                    <div>
+                                        <strong>Driver:</strong> Pedro Garcia - Vehicle: MB-2301
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-clock"></i>
+                                    <div>
+                                        <strong>Scheduled:</strong> Nov 25, 2025 - 4:00 PM
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="request-footer">
+                            <button class="btn btn-success btn-sm" onclick="startTransport('TR-2025-002')">
+                                <i class="fas fa-play"></i> Start Transport
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="viewDetails('TR-2025-002')">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Request Card 3 -->
+                    <div class="request-card" data-status="in-transit">
+                        <div class="request-header">
+                            <div class="request-id">
+                                <span class="label">Request ID:</span>
+                                <span class="value">#TR-2025-003</span>
+                            </div>
+                            <span class="status-badge status-in-transit">In Transit</span>
+                        </div>
+                        <div class="request-body">
+                            <div class="patient-info">
+                                <h4><i class="fas fa-user-injured"></i> Ana Reyes</h4>
+                                <p class="text-secondary">Age: 32 | Female</p>
+                            </div>
+                            <div class="transport-details">
+                                <div class="detail-row">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <div>
+                                        <strong>From:</strong> Barangay Pardo Health Center
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-hospital"></i>
+                                    <div>
+                                        <strong>To:</strong> Cebu City Medical Center
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-user-md"></i>
+                                    <div>
+                                        <strong>Driver:</strong> Jose Ramirez - Vehicle: MB-2302
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-route"></i>
+                                    <div>
+                                        <strong>Status:</strong> En route to destination - ETA 15 mins
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="request-footer">
+                            <button class="btn btn-info btn-sm" onclick="trackTransport('TR-2025-003')">
+                                <i class="fas fa-map-marked-alt"></i> Track Location
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="completeTransport('TR-2025-003')">
+                                <i class="fas fa-check"></i> Complete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referrals Tab -->
+            <div class="tab-content" id="referralsTab">
+                <div class="content-header">
+                    <h3>Hospital Referrals Management</h3>
+                    <button class="btn btn-primary" onclick="createReferral()">
+                        <i class="fas fa-file-medical"></i> Create Referral
+                    </button>
+                </div>
+
+                <div class="referrals-table">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Referral ID</th>
+                                <th>Patient Name</th>
+                                <th>From Facility</th>
+                                <th>To Hospital</th>
+                                <th>Specialty</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>#RF-001</strong></td>
+                                <td>Carlos Mendoza</td>
+                                <td>Clinikabayan - Minglanilla</td>
+                                <td>Chong Hua Hospital</td>
+                                <td>Cardiology</td>
+                                <td><span class="priority-high">High</span></td>
+                                <td><span class="status-badge status-pending">Pending</span></td>
+                                <td>
+                                    <button class="btn-icon" onclick="editReferral('RF-001')" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-icon" onclick="printReferral('RF-001')" title="Print">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>#RF-002</strong></td>
+                                <td>Linda Gomez</td>
+                                <td>Barangay San Nicolas</td>
+                                <td>Cebu Doctors' University Hospital</td>
+                                <td>OB-GYN</td>
+                                <td><span class="priority-medium">Medium</span></td>
+                                <td><span class="status-badge status-assigned">Accepted</span></td>
+                                <td>
+                                    <button class="btn-icon" onclick="editReferral('RF-002')" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-icon" onclick="printReferral('RF-002')" title="Print">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>#RF-003</strong></td>
+                                <td>Roberto Flores</td>
+                                <td>Clinikabayan Mobile Unit</td>
+                                <td>Vicente Sotto Memorial</td>
+                                <td>Orthopedics</td>
+                                <td><span class="priority-low">Low</span></td>
+                                <td><span class="status-badge status-completed">Completed</span></td>
+                                <td>
+                                    <button class="btn-icon" onclick="viewReferral('RF-003')" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn-icon" onclick="printReferral('RF-003')" title="Print">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Vehicles & Drivers Tab -->
+            <div class="tab-content" id="vehiclesTab">
+                <div class="content-header">
+                    <h3>Fleet Management</h3>
+                    <button class="btn btn-primary" onclick="addVehicle()">
+                        <i class="fas fa-plus"></i> Add Vehicle
+                    </button>
+                </div>
+
+                <div class="vehicles-grid">
+                    <!-- Vehicle Card 1 -->
+                    <div class="vehicle-card available">
+                        <div class="vehicle-header">
+                            <div class="vehicle-icon">
+                                <i class="fas fa-ambulance"></i>
+                            </div>
+                            <span class="vehicle-status status-available">Available</span>
+                        </div>
+                        <div class="vehicle-body">
+                            <h4>Ambulance Unit 1</h4>
+                            <p class="vehicle-plate">MB-2301</p>
+                            <div class="vehicle-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>Pedro Garcia</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>+63 912 345 6789</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-gas-pump"></i>
+                                    <span>Fuel: 85%</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Location: Cebu City</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="vehicle-footer">
+                            <button class="btn btn-sm btn-secondary" onclick="assignToRequest('MB-2301')">
+                                <i class="fas fa-tasks"></i> Assign
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="viewVehicle('MB-2301')">
+                                <i class="fas fa-info-circle"></i> Details
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Card 2 -->
+                    <div class="vehicle-card in-use">
+                        <div class="vehicle-header">
+                            <div class="vehicle-icon">
+                                <i class="fas fa-ambulance"></i>
+                            </div>
+                            <span class="vehicle-status status-in-use">In Use</span>
+                        </div>
+                        <div class="vehicle-body">
+                            <h4>Ambulance Unit 2</h4>
+                            <p class="vehicle-plate">MB-2302</p>
+                            <div class="vehicle-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>Jose Ramirez</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>+63 917 654 3210</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-gas-pump"></i>
+                                    <span>Fuel: 62%</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-route"></i>
+                                    <span>Request: #TR-2025-003</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="vehicle-footer">
+                            <button class="btn btn-sm btn-info" onclick="trackVehicle('MB-2302')">
+                                <i class="fas fa-map-marked-alt"></i> Track
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="viewVehicle('MB-2302')">
+                                <i class="fas fa-info-circle"></i> Details
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Card 3 -->
+                    <div class="vehicle-card maintenance">
+                        <div class="vehicle-header">
+                            <div class="vehicle-icon">
+                                <i class="fas fa-van-shuttle"></i>
+                            </div>
+                            <span class="vehicle-status status-maintenance">Maintenance</span>
+                        </div>
+                        <div class="vehicle-body">
+                            <h4>Mobile Unit Van</h4>
+                            <p class="vehicle-plate">MB-2303</p>
+                            <div class="vehicle-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>Maria Torres</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-wrench"></i>
+                                    <span>Scheduled maintenance</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Return: Nov 27, 2025</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="vehicle-footer">
+                            <button class="btn btn-sm btn-secondary" onclick="viewVehicle('MB-2303')">
+                                <i class="fas fa-info-circle"></i> Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div class="tab-content" id="historyTab">
+                <div class="content-header">
+                    <h3>Transport History</h3>
+                    <div class="date-filter">
+                        <label>From:</label>
+                        <input type="date" id="dateFrom" value="2025-11-01">
+                        <label>To:</label>
+                        <input type="date" id="dateTo" value="2025-11-25">
+                        <button class="btn btn-secondary" onclick="filterHistory()">
+                            <i class="fas fa-filter"></i> Filter
+                        </button>
+                    </div>
+                </div>
+
+                <div class="history-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>142</h4>
+                            <p>Completed Transports</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>28 mins</h4>
+                            <p>Avg. Response Time</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-hospital"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>87</h4>
+                            <p>Hospital Referrals</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>2,847 km</h4>
+                            <p>Total Distance</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="history-table">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Request ID</th>
+                                <th>Date & Time</th>
+                                <th>Patient</th>
+                                <th>From → To</th>
+                                <th>Driver</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>#TR-2025-100</strong></td>
+                                <td>Nov 24, 2025 - 3:45 PM</td>
+                                <td>Elena Cruz</td>
+                                <td>Barangay Centro → Cebu City Hospital</td>
+                                <td>Pedro Garcia</td>
+                                <td>45 mins</td>
+                                <td><span class="status-badge status-completed">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>#TR-2025-099</strong></td>
+                                <td>Nov 24, 2025 - 1:20 PM</td>
+                                <td>Miguel Santos</td>
+                                <td>Mobile Unit → Provincial Hospital</td>
+                                <td>Jose Ramirez</td>
+                                <td>32 mins</td>
+                                <td><span class="status-badge status-completed">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>#TR-2025-098</strong></td>
+                                <td>Nov 23, 2025 - 11:00 AM</td>
+                                <td>Rosa Diaz</td>
+                                <td>Talisay Center → VSMMC</td>
+                                <td>Maria Torres</td>
+                                <td>28 mins</td>
+                                <td><span class="status-badge status-completed">Completed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/dashboard.js"></script>
+    <script src="../js/transport-referral.js"></script>
+</body>
+</html>

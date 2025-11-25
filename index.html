@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinikabayan HIS - Login</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <!-- Logo and Branding -->
+        <div class="login-header">
+            <div class="logo">
+                <img src="assets/logo.png" alt="Clinikabayan Logo" class="logo-image">
+            </div>
+            <h1 class="brand-title">Clinikabayan</h1>
+            <p class="brand-subtitle">Health Information System</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="card login-card">
+            <div class="card-header text-center">
+                <h2>Welcome Back</h2>
+                <p class="text-secondary">Sign in to access your account</p>
+            </div>
+            
+            <div class="card-body">
+                <form id="loginForm" class="login-form">
+                    <!-- Email Input -->
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            class="form-control" 
+                            placeholder="your.email@clinikabayan.org"
+                            required
+                        >
+                    </div>
+
+                    <!-- Password Input -->
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="password-input-wrapper">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                class="form-control" 
+                                placeholder="Enter your password"
+                                required
+                            >
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password')">
+                                <i class="fas fa-eye" id="password-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="remember">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-password">Forgot password?</a>
+                    </div>
+
+                    <!-- Login Button -->
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Sign In
+                    </button>
+
+                    <!-- Divider -->
+                    <div class="divider">
+                        <span>OR</span>
+                    </div>
+
+                    <!-- Register Link -->
+                    <div class="text-center">
+                        <p style="color: white; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">Don't have an account? 
+                            <a href="#" id="showRegister" class="register-link">Register here</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Registration Card (Initially Hidden) -->
+        <div class="card login-card registration-card" style="display: none;">
+            <div class="card-header text-center">
+                <h2>Create Account</h2>
+                <p class="text-secondary">Join the Clinikabayan team</p>
+            </div>
+            
+            <div class="card-body">
+                <form id="registrationForm" class="login-form">
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label for="fullname" class="form-label">Full Name</label>
+                        <input 
+                            type="text" 
+                            id="fullname" 
+                            class="form-control" 
+                            placeholder="Juan Dela Cruz"
+                            required
+                        >
+                    </div>
+
+                    <!-- Email Input -->
+                    <div class="form-group">
+                        <label for="reg-email" class="form-label">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="reg-email" 
+                            class="form-control" 
+                            placeholder="your.email@clinikabayan.org"
+                            required
+                        >
+                    </div>
+
+                    <!-- User Role Selection -->
+                    <div class="form-group">
+                        <label for="userRole" class="form-label">User Role</label>
+                        <select id="userRole" class="form-select" required>
+                            <option value="">Select your role...</option>
+                            <option value="admin">Administrator</option>
+                            <option value="medical-staff">Medical Staff</option>
+                            <option value="volunteer">Volunteer</option>
+                            <option value="data-encoder">Data Encoder</option>
+                            <option value="driver">Driver/Transport</option>
+                            <option value="coordinator">Program Coordinator</option>
+                        </select>
+                    </div>
+
+                    <!-- Password Input -->
+                    <div class="form-group">
+                        <label for="reg-password" class="form-label">Password</label>
+                        <div class="password-input-wrapper">
+                            <input 
+                                type="password" 
+                                id="reg-password" 
+                                class="form-control" 
+                                placeholder="Create a strong password"
+                                required
+                            >
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('reg-password')">
+                                <i class="fas fa-eye" id="reg-password-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="form-group">
+                        <label for="confirm-password" class="form-label">Confirm Password</label>
+                        <div class="password-input-wrapper">
+                            <input 
+                                type="password" 
+                                id="confirm-password" 
+                                class="form-control" 
+                                placeholder="Re-enter your password"
+                                required
+                            >
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirm-password')">
+                                <i class="fas fa-eye" id="confirm-password-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="terms" required>
+                            <span>I agree to the <a href="#">Terms and Conditions</a></span>
+                        </label>
+                    </div>
+
+                    <!-- Register Button -->
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Create Account
+                    </button>
+
+                    <!-- Back to Login -->
+                    <div class="text-center mt-2">
+                        <p style="color: white; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">Already have an account? 
+                            <a href="#" id="showLogin" class="register-link">Sign in</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="login-footer" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
+            <p style="color: white; font-weight: 600;">&copy; 2025 Clinikabayan. All rights reserved.</p>
+            <p style="color: rgba(255,255,255,0.95); font-weight: 500;">Healthcare is a right, not a privilege.</p>
+        </div>
+    </div>
+
+    <!-- Philippine Time Clock -->
+    <div class="ph-time-clock">
+        <div class="clock-icon">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="clock-content">
+            <div class="clock-time" id="phTime">--:--:-- --</div>
+            <div class="clock-date" id="phDate">Loading...</div>
+            <div class="clock-timezone">Philippine Time (GMT+8)</div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-auth.js"></script>
+    
+    <!-- Login Script -->
+    <script src="js/login.js"></script>
+</body>
+</html>

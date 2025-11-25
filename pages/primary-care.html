@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primary Care Services - Clinikabayan HIS</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/primary-care.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-small">
+                <img src="../assets/logo.png" alt="Clinikabayan Logo" class="logo-image-small">
+            </div>
+            <h3>Clinikabayan</h3>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="primary-care.html" class="nav-item active">
+                <i class="fas fa-heartbeat"></i>
+                <span>Primary Care</span>
+            </a>
+            <a href="transport-referral.html" class="nav-item">
+                <i class="fas fa-ambulance"></i>
+                <span>Transport & Referral</span>
+            </a>
+            <a href="health-campaigns.html" class="nav-item">
+                <i class="fas fa-bullhorn"></i>
+                <span>Health Campaigns</span>
+            </a>
+            <a href="reports.html" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <p class="user-name" id="userName">Admin User</p>
+                    <p class="user-role">Administrator</p>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="btn-menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Primary Care Services</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="btn btn-primary" id="btnNewPatient">
+                    <i class="fas fa-user-plus"></i> New Patient
+                </button>
+            </div>
+        </header>
+
+        <!-- Primary Care Content -->
+        <div class="dashboard-container">
+            <!-- Tabs Navigation -->
+            <div class="tabs-container">
+                <button class="tab-btn active" data-tab="admission">
+                    <i class="fas fa-notes-medical"></i> Admission Dashboard
+                </button>
+                <button class="tab-btn" data-tab="demographics">
+                    <i class="fas fa-chart-pie"></i> Demographics
+                </button>
+                <button class="tab-btn" data-tab="inventory">
+                    <i class="fas fa-pills"></i> Inventory
+                </button>
+                <button class="tab-btn" data-tab="volunteers">
+                    <i class="fas fa-user-friends"></i> Volunteers
+                </button>
+                <button class="tab-btn" data-tab="tests">
+                    <i class="fas fa-microscope"></i> Available Tests
+                </button>
+            </div>
+
+            <!-- Tab Content: Admission Dashboard -->
+            <div class="tab-content active" id="tab-admission">
+                <div class="content-header">
+                    <h2>Electronic Health Records (EHR)</h2>
+                    <div class="search-filter-group">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search patient by name, ID..." id="patientSearch">
+                        </div>
+                        <select class="form-select" id="filterStatus">
+                            <option value="all">All Patients</option>
+                            <option value="active">Active</option>
+                            <option value="ongoing">Ongoing Treatment</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Patient List -->
+                <div class="patients-grid">
+                    <div class="patient-card" onclick="viewPatient(1)">
+                        <div class="patient-header">
+                            <div class="patient-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="patient-basic-info">
+                                <h4>Maria Santos</h4>
+                                <p class="patient-id">ID: CK-2025-001</p>
+                            </div>
+                            <span class="badge badge-success">Active</span>
+                        </div>
+                        <div class="patient-details">
+                            <div class="detail-item">
+                                <i class="fas fa-birthday-cake"></i>
+                                <span>34 years old, Female</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Barangay San Jose, Cebu City</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Last Visit: Nov 20, 2025</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-notes-medical"></i>
+                                <span>Ongoing: Prenatal Care</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="patient-card" onclick="viewPatient(2)">
+                        <div class="patient-header">
+                            <div class="patient-avatar male">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="patient-basic-info">
+                                <h4>Juan Reyes</h4>
+                                <p class="patient-id">ID: CK-2025-002</p>
+                            </div>
+                            <span class="badge badge-warning">Ongoing</span>
+                        </div>
+                        <div class="patient-details">
+                            <div class="detail-item">
+                                <i class="fas fa-birthday-cake"></i>
+                                <span>56 years old, Male</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Barangay Talamban, Cebu City</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Last Visit: Nov 24, 2025</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-notes-medical"></i>
+                                <span>Ongoing: Hypertension Management</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="patient-card" onclick="viewPatient(3)">
+                        <div class="patient-header">
+                            <div class="patient-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="patient-basic-info">
+                                <h4>Ana Lopez</h4>
+                                <p class="patient-id">ID: CK-2025-003</p>
+                            </div>
+                            <span class="badge badge-primary">Active</span>
+                        </div>
+                        <div class="patient-details">
+                            <div class="detail-item">
+                                <i class="fas fa-birthday-cake"></i>
+                                <span>12 years old, Female</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Sitio Maharlika, Mandaue City</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Last Visit: Nov 22, 2025</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-notes-medical"></i>
+                                <span>Recent: Vaccination (MMR)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Demographics -->
+            <div class="tab-content" id="tab-demographics">
+                <div class="content-header">
+                    <h2>Service Areas & Demographics</h2>
+                </div>
+                
+                <div class="demographics-grid">
+                    <div class="demo-card">
+                        <h3>Service Coverage by City/Municipality</h3>
+                        <div class="demo-list">
+                            <div class="demo-item">
+                                <div class="demo-info">
+                                    <strong>Cebu City</strong>
+                                    <span class="demo-detail">32 Barangays</span>
+                                </div>
+                                <span class="demo-count">1,245 patients</span>
+                            </div>
+                            <div class="demo-item">
+                                <div class="demo-info">
+                                    <strong>Mandaue City</strong>
+                                    <span class="demo-detail">18 Barangays</span>
+                                </div>
+                                <span class="demo-count">687 patients</span>
+                            </div>
+                            <div class="demo-item">
+                                <div class="demo-info">
+                                    <strong>Lapu-Lapu City</strong>
+                                    <span class="demo-detail">12 Barangays</span>
+                                </div>
+                                <span class="demo-count">453 patients</span>
+                            </div>
+                            <div class="demo-item">
+                                <div class="demo-info">
+                                    <strong>Talisay City</strong>
+                                    <span class="demo-detail">15 Barangays</span>
+                                </div>
+                                <span class="demo-count">362 patients</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="demo-card">
+                        <h3>Patient Demographics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <p class="stat-label">Total Patients</p>
+                                <p class="stat-value">2,847</p>
+                            </div>
+                            <div class="stat-box">
+                                <p class="stat-label">Children (0-12)</p>
+                                <p class="stat-value">789</p>
+                            </div>
+                            <div class="stat-box">
+                                <p class="stat-label">Adults (13-59)</p>
+                                <p class="stat-value">1,645</p>
+                            </div>
+                            <div class="stat-box">
+                                <p class="stat-label">Senior (60+)</p>
+                                <p class="stat-value">413</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="demo-card full-width">
+                        <h3>Recent Service Areas</h3>
+                        <div class="areas-timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Barangay San Jose, Cebu City</h4>
+                                    <p>Medical Mission - Nov 24, 2025</p>
+                                    <p class="timeline-detail">45 patients served | Services: General Consultation, Vaccination</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Sitio Maharlika, Mandaue City</h4>
+                                    <p>ClinikaCaravan Visit - Nov 22, 2025</p>
+                                    <p class="timeline-detail">38 patients served | Services: Prenatal Care, Pediatric Check-up</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Barangay Talamban, Cebu City</h4>
+                                    <p>Health Screening - Nov 20, 2025</p>
+                                    <p class="timeline-detail">62 patients served | Services: Blood Pressure, Blood Sugar Screening</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Inventory -->
+            <div class="tab-content" id="tab-inventory">
+                <div class="content-header">
+                    <h2>Medical Supplies Inventory</h2>
+                    <button class="btn btn-primary" id="btnAddSupply">
+                        <i class="fas fa-plus"></i> Add Supply
+                    </button>
+                </div>
+
+                <div class="inventory-grid">
+                    <div class="inventory-card warning">
+                        <div class="inventory-header">
+                            <h4>Paracetamol 500mg</h4>
+                            <span class="badge badge-warning">Low Stock</span>
+                        </div>
+                        <div class="inventory-body">
+                            <div class="inventory-stat">
+                                <p class="label">Current Stock</p>
+                                <p class="value warning">120 tablets</p>
+                            </div>
+                            <div class="inventory-stat">
+                                <p class="label">Reorder Level</p>
+                                <p class="value">200 tablets</p>
+                            </div>
+                            <div class="inventory-stat">
+                                <p class="label">Last Restock</p>
+                                <p class="value">Oct 15, 2025</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-block">Reorder</button>
+                    </div>
+
+                    <div class="inventory-card">
+                        <div class="inventory-header">
+                            <h4>Blood Pressure Monitor</h4>
+                            <span class="badge badge-success">Available</span>
+                        </div>
+                        <div class="inventory-body">
+                            <div class="inventory-stat">
+                                <p class="label">Current Stock</p>
+                                <p class="value">8 units</p>
+                            </div>
+                            <div class="inventory-stat">
+                                <p class="label">In Use</p>
+                                <p class="value">3 units</p>
+                            </div>
+                            <div class="inventory-stat">
+                                <p class="label">Last Maintenance</p>
+                                <p class="value">Nov 10, 2025</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-block">View Details</button>
+                    </div>
+
+                    <div class="inventory-card critical">
+                        <div class="inventory-header">
+                            <h4>Disposable Syringes</h4>
+                            <span class="badge badge-danger">Critical</span>
+                        </div>
+                        <div class="inventory-body">
+                            <div class="inventory-stat">
+                                <p class="label">Current Stock</p>
+                                <p class="value critical">35 pieces</p>
+                            </div>
+                            <div class="inventory-stat">
+                                <p class="label">Reorder Level</p>
+                                <p class="value">100 pieces</p>
+                            </div>
+                            <div class="inventory-stat">
+                                <p class="label">Last Restock</p>
+                                <p class="value">Nov 5, 2025</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-block">Urgent Reorder</button>
+                    </div>
+
+                    <div class="inventory-card">
+                        <div class="inventory-header">
+                            <h4>Alcohol 70%</h4>
+                            <span class="badge badge-success">Good Stock</span>
+                        </div>
+                        <div class="inventory-body">
+                            <div class="inventory-stat">
+                                <p class="label">Current Stock</p>
+                                <p class="value">45 liters</p>
+                            </div>
+                            <div class="inventory-stat">
+                                <p class="label">Reorder Level</p>
+                                <p class="value">15 liters</p>
+                            </div>
+                            <div class="inventory-stat">
+                                <p class="label">Last Restock</p>
+                                <p class="value">Nov 18, 2025</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-block">View Details</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Volunteers -->
+            <div class="tab-content" id="tab-volunteers">
+                <div class="content-header">
+                    <h2>Medical Volunteers</h2>
+                    <button class="btn btn-primary" id="btnAddVolunteer">
+                        <i class="fas fa-user-plus"></i> Add Volunteer
+                    </button>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Specialization</th>
+                            <th>Status</th>
+                            <th>Next Schedule</th>
+                            <th>Total Hours</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="volunteer-info">
+                                    <div class="volunteer-avatar">DR</div>
+                                    <span>Dr. Rosa Martinez</span>
+                                </div>
+                            </td>
+                            <td>General Physician</td>
+                            <td><span class="badge badge-success">Available</span></td>
+                            <td>Nov 27, 2025 - Barangay Luz</td>
+                            <td>124 hours</td>
+                            <td>
+                                <button class="btn-icon" title="View Schedule">
+                                    <i class="fas fa-calendar"></i>
+                                </button>
+                                <button class="btn-icon" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="volunteer-info">
+                                    <div class="volunteer-avatar">NJ</div>
+                                    <span>Nurse Joy Santos</span>
+                                </div>
+                            </td>
+                            <td>Registered Nurse</td>
+                            <td><span class="badge badge-success">Available</span></td>
+                            <td>Nov 26, 2025 - Sitio Maharlika</td>
+                            <td>98 hours</td>
+                            <td>
+                                <button class="btn-icon" title="View Schedule">
+                                    <i class="fas fa-calendar"></i>
+                                </button>
+                                <button class="btn-icon" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="volunteer-info">
+                                    <div class="volunteer-avatar">ML</div>
+                                    <span>MT Luis Garcia</span>
+                                </div>
+                            </td>
+                            <td>Medical Technologist</td>
+                            <td><span class="badge badge-warning">On Leave</span></td>
+                            <td>Nov 30, 2025 - Main Facility</td>
+                            <td>87 hours</td>
+                            <td>
+                                <button class="btn-icon" title="View Schedule">
+                                    <i class="fas fa-calendar"></i>
+                                </button>
+                                <button class="btn-icon" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab Content: Available Tests -->
+            <div class="tab-content" id="tab-tests">
+                <div class="content-header">
+                    <h2>Available Medical Tests</h2>
+                    <button class="btn btn-primary" id="btnAddTest">
+                        <i class="fas fa-plus"></i> Add Test
+                    </button>
+                </div>
+
+                <div class="tests-grid">
+                    <div class="test-card">
+                        <div class="test-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <h4>Blood Sugar Test</h4>
+                        <p class="test-description">Fasting Blood Sugar (FBS) / Random Blood Sugar (RBS)</p>
+                        <div class="test-details">
+                            <div class="test-detail">
+                                <i class="fas fa-clock"></i>
+                                <span>15 minutes</span>
+                            </div>
+                            <div class="test-detail">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>Free</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-block" onclick="viewTestInfo('blood-sugar')">
+                            View Interpretation Guide
+                        </button>
+                    </div>
+
+                    <div class="test-card">
+                        <div class="test-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h4>Blood Pressure Monitoring</h4>
+                        <p class="test-description">Systolic and Diastolic BP measurement</p>
+                        <div class="test-details">
+                            <div class="test-detail">
+                                <i class="fas fa-clock"></i>
+                                <span>5 minutes</span>
+                            </div>
+                            <div class="test-detail">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>Free</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-block" onclick="viewTestInfo('blood-pressure')">
+                            View Interpretation Guide
+                        </button>
+                    </div>
+
+                    <div class="test-card">
+                        <div class="test-icon">
+                            <i class="fas fa-weight"></i>
+                        </div>
+                        <h4>BMI Assessment</h4>
+                        <p class="test-description">Body Mass Index calculation and interpretation</p>
+                        <div class="test-details">
+                            <div class="test-detail">
+                                <i class="fas fa-clock"></i>
+                                <span>10 minutes</span>
+                            </div>
+                            <div class="test-detail">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>Free</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-block" onclick="viewTestInfo('bmi')">
+                            View Interpretation Guide
+                        </button>
+                    </div>
+
+                    <div class="test-card">
+                        <div class="test-icon">
+                            <i class="fas fa-lungs"></i>
+                        </div>
+                        <h4>Respiratory Assessment</h4>
+                        <p class="test-description">Basic lung function and oxygen saturation check</p>
+                        <div class="test-details">
+                            <div class="test-detail">
+                                <i class="fas fa-clock"></i>
+                                <span>15 minutes</span>
+                            </div>
+                            <div class="test-detail">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>Free</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-block" onclick="viewTestInfo('respiratory')">
+                            View Interpretation Guide
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- New Patient Registration Modal -->
+    <div id="newPatientModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeNewPatientModal()"></div>
+        <div class="modal-content patient-registration-modal">
+            <div class="modal-header medical-header">
+                <h2><i class="fas fa-user-plus"></i> Patient Registration Form</h2>
+                <button class="modal-close" onclick="closeNewPatientModal()">✕</button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="patientRegistrationForm">
+                    <!-- Personal Information Section -->
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-user"></i> Personal Information</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group required">
+                                <label>Last Name</label>
+                                <input type="text" id="lastName" name="lastName" required>
+                            </div>
+                            <div class="form-group required">
+                                <label>First Name</label>
+                                <input type="text" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Middle Name</label>
+                                <input type="text" id="middleName" name="middleName">
+                            </div>
+                            <div class="form-group">
+                                <label>Suffix</label>
+                                <select id="suffix" name="suffix">
+                                    <option value="">None</option>
+                                    <option value="Jr.">Jr.</option>
+                                    <option value="Sr.">Sr.</option>
+                                    <option value="II">II</option>
+                                    <option value="III">III</option>
+                                    <option value="IV">IV</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group required">
+                                <label>Date of Birth</label>
+                                <input type="date" id="dateOfBirth" name="dateOfBirth" required onchange="calculateAge()">
+                            </div>
+                            <div class="form-group">
+                                <label>Age</label>
+                                <input type="number" id="age" name="age" readonly>
+                            </div>
+                            <div class="form-group required">
+                                <label>Sex</label>
+                                <select id="sex" name="sex" required>
+                                    <option value="">Select</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Civil Status</label>
+                                <select id="civilStatus" name="civilStatus">
+                                    <option value="">Select</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Widowed">Widowed</option>
+                                    <option value="Separated">Separated</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Blood Type</label>
+                                <select id="bloodType" name="bloodType">
+                                    <option value="">Unknown</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Religion</label>
+                                <input type="text" id="religion" name="religion">
+                            </div>
+                            <div class="form-group">
+                                <label>Occupation</label>
+                                <input type="text" id="occupation" name="occupation">
+                            </div>
+                            <div class="form-group">
+                                <label>Educational Attainment</label>
+                                <select id="education" name="education">
+                                    <option value="">Select</option>
+                                    <option value="Elementary">Elementary</option>
+                                    <option value="High School">High School</option>
+                                    <option value="College">College</option>
+                                    <option value="Vocational">Vocational</option>
+                                    <option value="Post-Graduate">Post-Graduate</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information Section -->
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-address-book"></i> Contact Information</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group full-width required">
+                                <label>Complete Address</label>
+                                <textarea id="address" name="address" rows="2" required placeholder="House No., Street, Sitio/Purok"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group required">
+                                <label>Barangay</label>
+                                <input type="text" id="barangay" name="barangay" required>
+                            </div>
+                            <div class="form-group required">
+                                <label>City/Municipality</label>
+                                <input type="text" id="city" name="city" required>
+                            </div>
+                            <div class="form-group required">
+                                <label>Province</label>
+                                <input type="text" id="province" name="province" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Zip Code</label>
+                                <input type="text" id="zipCode" name="zipCode">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group required">
+                                <label>Contact Number</label>
+                                <input type="tel" id="contactNumber" name="contactNumber" required placeholder="09XX-XXX-XXXX">
+                            </div>
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" id="email" name="email" placeholder="optional">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Emergency Contact Section -->
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-phone-alt"></i> Emergency Contact</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group required">
+                                <label>Contact Person Name</label>
+                                <input type="text" id="emergencyName" name="emergencyName" required>
+                            </div>
+                            <div class="form-group required">
+                                <label>Relationship</label>
+                                <input type="text" id="emergencyRelationship" name="emergencyRelationship" required placeholder="e.g., Spouse, Parent, Sibling">
+                            </div>
+                            <div class="form-group required">
+                                <label>Contact Number</label>
+                                <input type="tel" id="emergencyContact" name="emergencyContact" required placeholder="09XX-XXX-XXXX">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Health Insurance Section -->
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-shield-alt"></i> Health Insurance</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>PhilHealth Number</label>
+                                <input type="text" id="philhealthNumber" name="philhealthNumber" placeholder="XX-XXXXXXXXX-X">
+                            </div>
+                            <div class="form-group">
+                                <label>PhilHealth Category</label>
+                                <select id="philhealthCategory" name="philhealthCategory">
+                                    <option value="">None</option>
+                                    <option value="Direct Contributor">Direct Contributor</option>
+                                    <option value="Indirect Contributor">Indirect Contributor</option>
+                                    <option value="Sponsored">Sponsored</option>
+                                    <option value="Lifetime Member">Lifetime Member</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>4Ps Household ID</label>
+                                <input type="text" id="fourPsId" name="fourPsId" placeholder="Optional">
+                            </div>
+                            <div class="form-group">
+                                <label>PWD ID Number</label>
+                                <input type="text" id="pwdId" name="pwdId" placeholder="Optional">
+                            </div>
+                            <div class="form-group">
+                                <label>Senior Citizen ID</label>
+                                <input type="text" id="seniorId" name="seniorId" placeholder="Optional">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeNewPatientModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="saveNewPatient()">
+                    <i class="fas fa-save"></i> Save and Create Medical Record
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Medical Record Modal -->
+    <div id="patientRecordModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closePatientRecordModal()"></div>
+        <div class="modal-content patient-record-modal">
+            <div class="modal-header medical-header">
+                <div class="patient-header-info">
+                    <h2><i class="fas fa-notes-medical"></i> Medical Record</h2>
+                    <div class="patient-id-badge" id="recordPatientId">CK-2025-XXX</div>
+                </div>
+                <button class="modal-close" onclick="closePatientRecordModal()">✕</button>
+            </div>
+            
+            <!-- Patient Info Bar -->
+            <div class="patient-info-bar">
+                <div class="info-item">
+                    <strong>Patient:</strong> <span id="recordPatientName">---</span>
+                </div>
+                <div class="info-item">
+                    <strong>Age/Sex:</strong> <span id="recordAgeSex">---</span>
+                </div>
+                <div class="info-item">
+                    <strong>Blood Type:</strong> <span id="recordBloodType">---</span>
+                </div>
+                <div class="info-item">
+                    <strong>Address:</strong> <span id="recordAddress">---</span>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <form id="medicalRecordForm">
+                    <!-- Visit Information -->
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-calendar-check"></i> Visit Information</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group required">
+                                <label>Date & Time of Visit</label>
+                                <input type="datetime-local" id="visitDateTime" name="visitDateTime" required>
+                            </div>
+                            <div class="form-group required">
+                                <label>Type of Visit</label>
+                                <select id="visitType" name="visitType" required>
+                                    <option value="">Select</option>
+                                    <option value="New Consultation">New Consultation</option>
+                                    <option value="Follow-up">Follow-up</option>
+                                    <option value="Emergency">Emergency</option>
+                                    <option value="Pre-natal">Pre-natal</option>
+                                    <option value="Immunization">Immunization</option>
+                                    <option value="Health Screening">Health Screening</option>
+                                </select>
+                            </div>
+                            <div class="form-group required">
+                                <label>Attending Provider</label>
+                                <input type="text" id="attendingProvider" name="attendingProvider" required placeholder="Doctor/Nurse Name">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vital Signs -->
+                    <div class="form-section vital-signs-section">
+                        <h3 class="section-title"><i class="fas fa-heartbeat"></i> Vital Signs</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Blood Pressure (mmHg)</label>
+                                <div class="input-group">
+                                    <input type="text" id="bpSystolic" name="bpSystolic" placeholder="120" class="input-small">
+                                    <span class="input-divider">/</span>
+                                    <input type="text" id="bpDiastolic" name="bpDiastolic" placeholder="80" class="input-small">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Temperature (°C)</label>
+                                <input type="number" step="0.1" id="temperature" name="temperature" placeholder="36.5">
+                            </div>
+                            <div class="form-group">
+                                <label>Pulse Rate (bpm)</label>
+                                <input type="number" id="pulseRate" name="pulseRate" placeholder="72">
+                            </div>
+                            <div class="form-group">
+                                <label>Respiratory Rate (per min)</label>
+                                <input type="number" id="respiratoryRate" name="respiratoryRate" placeholder="16">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Weight (kg)</label>
+                                <input type="number" step="0.1" id="weight" name="weight" placeholder="65.0">
+                            </div>
+                            <div class="form-group">
+                                <label>Height (cm)</label>
+                                <input type="number" step="0.1" id="height" name="height" placeholder="165.0">
+                            </div>
+                            <div class="form-group">
+                                <label>BMI</label>
+                                <input type="number" step="0.1" id="bmi" name="bmi" readonly placeholder="Auto-calculated">
+                            </div>
+                            <div class="form-group">
+                                <label>Oxygen Saturation (%)</label>
+                                <input type="number" id="oxygenSat" name="oxygenSat" placeholder="98">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chief Complaint & History -->
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-comment-medical"></i> Chief Complaint & History</h3>
+                        
+                        <div class="form-group full-width required">
+                            <label>Chief Complaint</label>
+                            <textarea id="chiefComplaint" name="chiefComplaint" rows="2" required placeholder="Primary reason for visit"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>History of Present Illness (HPI)</label>
+                            <textarea id="hpi" name="hpi" rows="3" placeholder="Duration, onset, progression of symptoms"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Past Medical History</label>
+                            <textarea id="pastMedicalHistory" name="pastMedicalHistory" rows="2" placeholder="Previous illnesses, surgeries, hospitalizations"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Allergies</label>
+                                <textarea id="allergies" name="allergies" rows="2" placeholder="Food, drug, or environmental allergies"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Current Medications</label>
+                                <textarea id="currentMedications" name="currentMedications" rows="2" placeholder="List all current medications"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Physical Examination -->
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-stethoscope"></i> Physical Examination</h3>
+                        
+                        <div class="form-group full-width">
+                            <label>General Appearance</label>
+                            <textarea id="generalAppearance" name="generalAppearance" rows="2" placeholder="Patient's overall condition and appearance"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>HEENT (Head, Eyes, Ears, Nose, Throat)</label>
+                                <textarea id="heent" name="heent" rows="2" placeholder="Examination findings"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Cardiovascular</label>
+                                <textarea id="cardiovascular" name="cardiovascular" rows="2" placeholder="Heart sounds, rhythm"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Respiratory</label>
+                                <textarea id="respiratory" name="respiratory" rows="2" placeholder="Breath sounds, breathing pattern"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Abdomen</label>
+                                <textarea id="abdomen" name="abdomen" rows="2" placeholder="Inspection, palpation findings"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Other Findings / Extremities</label>
+                            <textarea id="otherFindings" name="otherFindings" rows="2" placeholder="Any other relevant examination findings"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Assessment & Plan -->
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-clipboard-check"></i> Assessment & Plan</h3>
+                        
+                        <div class="form-group full-width required">
+                            <label>Diagnosis / Assessment</label>
+                            <textarea id="diagnosis" name="diagnosis" rows="3" required placeholder="Primary and secondary diagnoses (use ICD-10 codes if available)"></textarea>
+                        </div>
+
+                        <div class="form-group full-width required">
+                            <label>Treatment Plan</label>
+                            <textarea id="treatmentPlan" name="treatmentPlan" rows="3" required placeholder="Medications prescribed, procedures, referrals"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Laboratory Tests Ordered</label>
+                                <textarea id="labTests" name="labTests" rows="2" placeholder="CBC, Urinalysis, X-ray, etc."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Medications Dispensed</label>
+                                <textarea id="medicationsDispensed" name="medicationsDispensed" rows="2" placeholder="List medications given"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Patient Education & Instructions</label>
+                            <textarea id="patientEducation" name="patientEducation" rows="2" placeholder="Home care instructions, lifestyle modifications"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Follow-up Date</label>
+                                <input type="date" id="followUpDate" name="followUpDate">
+                            </div>
+                            <div class="form-group">
+                                <label>Referral To</label>
+                                <input type="text" id="referralTo" name="referralTo" placeholder="If referred to specialist/hospital">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Provider Notes -->
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-file-medical"></i> Additional Notes</h3>
+                        
+                        <div class="form-group full-width">
+                            <label>Provider's Notes</label>
+                            <textarea id="providerNotes" name="providerNotes" rows="3" placeholder="Any additional observations or notes"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closePatientRecordModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-warning" onclick="saveDraft()">
+                    <i class="fas fa-save"></i> Save as Draft
+                </button>
+                <button type="button" class="btn btn-primary" onclick="saveMedicalRecord()">
+                    <i class="fas fa-check"></i> Save Medical Record
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/dashboard.js"></script>
+    <script src="../js/primary-care.js"></script>
+</body>
+</html>

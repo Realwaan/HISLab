@@ -1,0 +1,527 @@
+/* ============================================
+   LOGIN PAGE STYLES
+   ============================================ */
+
+.login-page {
+    background: url('../assets/background.png') center center / cover no-repeat;
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-md);
+}
+
+.login-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 0;
+}
+
+.login-container {
+    position: relative;
+    z-index: 1;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 450px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Logo and Branding */
+.login-header {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.logo {
+    display: inline-block;
+    margin-bottom: var(--spacing-sm);
+    animation: fadeInDown 0.6s ease;
+}
+
+.logo-image {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    display: block;
+    margin-top: 20px;
+}
+
+.brand-title {
+    color: var(--white);
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+    animation: fadeInDown 0.6s ease 0.1s both;
+}
+
+.brand-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: var(--font-size-base);
+    animation: fadeInDown 0.6s ease 0.2s both;
+}
+
+/* Login/Registration Card - Glassmorphism */
+.login-card,
+.registration-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.login-card {
+    animation: fadeInUp 0.6s ease 0.3s both;
+}
+
+.registration-card {
+    animation: fadeIn 0.4s ease;
+}
+
+/* Glass effect enhancement for card content */
+.login-card .card-header h2,
+.registration-card .card-header h2 {
+    color: var(--white);
+}
+
+.login-card .card-header .text-secondary,
+.registration-card .card-header .text-secondary {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.login-card .form-label,
+.registration-card .form-label {
+    color: var(--white);
+    font-weight: 500;
+}
+
+.login-card .form-control,
+.registration-card .form-control {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--white);
+}
+
+.login-card .form-control::placeholder,
+.registration-card .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.login-card .form-control:focus,
+.registration-card .form-control:focus {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: var(--white);
+}
+
+.login-form {
+    margin-top: var(--spacing-md);
+}
+
+/* Form Options */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.forgot-password {
+    font-size: var(--font-size-sm);
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+.forgot-password:hover {
+    color: var(--white);
+}
+
+/* Divider */
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: var(--spacing-lg) 0;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.divider span {
+    padding: 0 var(--spacing-sm);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+/* Register Link */
+.register-link {
+    color: var(--white);
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.register-link:hover {
+    text-decoration: underline;
+}
+
+/* Footer */
+.login-footer {
+    text-align: center;
+    margin-top: var(--spacing-lg);
+    color: var(--white);
+    animation: fadeIn 0.6s ease 0.5s both;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.login-footer p {
+    margin: var(--spacing-xs) 0;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .login-container {
+        max-width: 100%;
+    }
+    
+    .brand-title {
+        font-size: 28px;
+    }
+    
+    .form-options {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        align-items: flex-start;
+    }
+}
+
+/* Password Input Wrapper */
+.password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-wrapper .form-control {
+    padding-right: 45px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 18px;
+}
+
+.toggle-password:hover {
+    color: rgba(255, 255, 255, 1);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.toggle-password:focus {
+    outline: none;
+}
+
+/* Input Focus Effects */
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+/* Button Hover Effect */
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(33, 150, 243, 0.3);
+}
+
+/* Error State */
+.form-control.error {
+    border-color: var(--danger-color);
+}
+
+.error-message {
+    color: var(--danger-color);
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Philippine Time Clock */
+.ph-time-clock {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: 3px solid #2196F3;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: -4px 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    animation: fadeInDown 0.6s ease 0.6s both;
+    min-width: 320px;
+}
+
+.clock-icon {
+    font-size: 28px;
+    color: #2196F3;
+    opacity: 0.9;
+}
+
+.clock-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+}
+
+.clock-time {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 1px;
+    font-family: 'Courier New', monospace;
+}
+
+.clock-date {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555555;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.clock-timezone {
+    font-size: 10px;
+    font-weight: 600;
+    color: #2196F3;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-top: 1px;
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+}
+
+/* Error Modal */
+.error-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.error-modal-overlay.active {
+    opacity: 1;
+}
+
+.error-modal {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    max-width: 450px;
+    width: 90%;
+    overflow: hidden;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.error-modal-overlay.active .error-modal {
+    transform: scale(1);
+}
+
+.error-modal-header {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: white;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.error-modal-header i {
+    font-size: 32px;
+}
+
+.error-modal-header h3 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.error-modal-body {
+    padding: 24px;
+    color: #333;
+}
+
+.error-modal-body p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #555;
+}
+
+.error-modal-footer {
+    padding: 16px 24px;
+    display: flex;
+    justify-content: flex-end;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn-error-ok {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-error-ok:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+/* Responsive adjustments for clock */
+@media (max-width: 768px) {
+    .ph-time-clock {
+        top: 0;
+        right: 0;
+        padding: 12px 20px;
+        min-width: 280px;
+    }
+    
+    .clock-icon {
+        font-size: 24px;
+    }
+    
+    .clock-time {
+        font-size: 20px;
+    }
+    
+    .clock-date {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ph-time-clock {
+        top: 0;
+        right: 0;
+        left: auto;
+        padding: 10px 16px;
+        min-width: 240px;
+    }
+    
+    .clock-icon {
+        font-size: 22px;
+    }
+    
+    .clock-time {
+        font-size: 18px;
+    }
+}

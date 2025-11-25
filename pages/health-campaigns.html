@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Campaigns - Clinikabayan HIS</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/health-campaigns.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-small">
+                <img src="../assets/logo.png" alt="Clinikabayan Logo" class="logo-image-small">
+            </div>
+            <h3>Clinikabayan</h3>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="primary-care.html" class="nav-item">
+                <i class="fas fa-heartbeat"></i>
+                <span>Primary Care</span>
+            </a>
+            <a href="transport-referral.html" class="nav-item">
+                <i class="fas fa-ambulance"></i>
+                <span>Transport & Referral</span>
+            </a>
+            <a href="health-campaigns.html" class="nav-item active">
+                <i class="fas fa-bullhorn"></i>
+                <span>Health Campaigns</span>
+            </a>
+            <a href="reports.html" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <p class="user-name" id="userName">Admin User</p>
+                    <p class="user-role">Administrator</p>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="btn-menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Health Education Campaigns</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="btn btn-primary" id="btnNewCampaign">
+                    <i class="fas fa-plus"></i> New Campaign
+                </button>
+            </div>
+        </header>
+
+        <!-- Campaigns Content -->
+        <div class="dashboard-container">
+            <!-- Tabs Navigation -->
+            <div class="tabs-container">
+                <button class="tab-btn active" data-tab="overview">
+                    <i class="fas fa-chart-line"></i> Overview
+                </button>
+                <button class="tab-btn" data-tab="upcoming">
+                    <i class="fas fa-calendar-alt"></i> Upcoming
+                </button>
+                <button class="tab-btn" data-tab="active">
+                    <i class="fas fa-bullhorn"></i> Active
+                </button>
+                <button class="tab-btn" data-tab="completed">
+                    <i class="fas fa-check-double"></i> Completed
+                </button>
+                <button class="tab-btn" data-tab="resources">
+                    <i class="fas fa-warehouse"></i> Resources
+                </button>
+            </div>
+
+            <!-- Overview Tab -->
+            <div class="tab-content active" id="overviewTab">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #4CAF50;">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>8</h4>
+                            <p>Upcoming Campaigns</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #2196F3;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>3,452</h4>
+                            <p>Total Participants</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #FFC107;">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>24</h4>
+                            <p>Barangays Covered</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #9C27B0;">
+                            <i class="fas fa-syringe"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>1,827</h4>
+                            <p>Vaccines Administered</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="campaign-timeline">
+                    <h3><i class="fas fa-stream"></i> Campaign Timeline</h3>
+                    <div class="timeline">
+                        <!-- Timeline Item 1 -->
+                        <div class="timeline-item upcoming">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">December 1, 2025</div>
+                                <h4>Free Dental Check-up Campaign</h4>
+                                <p class="location"><i class="fas fa-map-marker-alt"></i> Barangay Guadalupe</p>
+                                <p class="description">Free dental consultation and basic dental services for residents</p>
+                                <div class="timeline-meta">
+                                    <span><i class="fas fa-users"></i> Expected: 200 participants</span>
+                                    <span><i class="fas fa-user-md"></i> 5 dentists, 3 assistants</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline Item 2 -->
+                        <div class="timeline-item active">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">November 25, 2025</div>
+                                <h4>Diabetes Awareness & Screening</h4>
+                                <p class="location"><i class="fas fa-map-marker-alt"></i> Barangay Talisay</p>
+                                <p class="description">Free blood sugar testing and diabetes education seminar</p>
+                                <div class="timeline-meta">
+                                    <span><i class="fas fa-users"></i> Current: 87/150 participants</span>
+                                    <span class="status-active">ONGOING</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline Item 3 -->
+                        <div class="timeline-item completed">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">November 18, 2025</div>
+                                <h4>COVID-19 Booster Vaccination Drive</h4>
+                                <p class="location"><i class="fas fa-map-marker-alt"></i> Barangay San Nicolas</p>
+                                <p class="description">Free COVID-19 booster shots for eligible residents</p>
+                                <div class="timeline-meta">
+                                    <span><i class="fas fa-check-circle"></i> 342 vaccinated</span>
+                                    <span class="status-completed">COMPLETED</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Tab -->
+            <div class="tab-content" id="upcomingTab">
+                <div class="campaigns-grid">
+                    <!-- Campaign Card 1 -->
+                    <div class="campaign-card">
+                        <div class="campaign-header">
+                            <div class="campaign-icon">
+                                <i class="fas fa-tooth"></i>
+                            </div>
+                            <span class="campaign-status status-upcoming">Upcoming</span>
+                        </div>
+                        <div class="campaign-body">
+                            <h3>Free Dental Check-up Campaign</h3>
+                            <div class="campaign-date">
+                                <i class="fas fa-calendar"></i>
+                                <span>December 1, 2025 | 8:00 AM - 5:00 PM</span>
+                            </div>
+                            <div class="campaign-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Barangay Guadalupe Community Center</span>
+                            </div>
+                            <div class="campaign-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>Target: 200 participants</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-user-md"></i>
+                                    <span>Team: 5 dentists, 3 assistants</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-box"></i>
+                                    <span>Resources: Ready</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="campaign-footer">
+                            <button class="btn btn-primary btn-sm" onclick="editCampaign('DC-001')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="viewCampaign('DC-001')">
+                                <i class="fas fa-eye"></i> Details
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Campaign Card 2 -->
+                    <div class="campaign-card">
+                        <div class="campaign-header">
+                            <div class="campaign-icon" style="background: #9C27B0;">
+                                <i class="fas fa-syringe"></i>
+                            </div>
+                            <span class="campaign-status status-upcoming">Upcoming</span>
+                        </div>
+                        <div class="campaign-body">
+                            <h3>Flu Vaccination Drive</h3>
+                            <div class="campaign-date">
+                                <i class="fas fa-calendar"></i>
+                                <span>December 5, 2025 | 9:00 AM - 4:00 PM</span>
+                            </div>
+                            <div class="campaign-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Barangay Pardo Health Center</span>
+                            </div>
+                            <div class="campaign-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>Target: 300 participants</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-user-nurse"></i>
+                                    <span>Team: 4 nurses, 2 volunteers</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>Resources: Pending delivery</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="campaign-footer">
+                            <button class="btn btn-primary btn-sm" onclick="editCampaign('FV-001')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="viewCampaign('FV-001')">
+                                <i class="fas fa-eye"></i> Details
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Campaign Card 3 -->
+                    <div class="campaign-card">
+                        <div class="campaign-header">
+                            <div class="campaign-icon" style="background: #FF5722;">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <span class="campaign-status status-upcoming">Upcoming</span>
+                        </div>
+                        <div class="campaign-body">
+                            <h3>Hypertension Screening</h3>
+                            <div class="campaign-date">
+                                <i class="fas fa-calendar"></i>
+                                <span>December 8, 2025 | 7:00 AM - 12:00 PM</span>
+                            </div>
+                            <div class="campaign-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Barangay Bulacao Plaza</span>
+                            </div>
+                            <div class="campaign-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>Target: 150 participants</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-user-md"></i>
+                                    <span>Team: 2 doctors, 4 nurses</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-box"></i>
+                                    <span>Resources: Ready</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="campaign-footer">
+                            <button class="btn btn-primary btn-sm" onclick="editCampaign('HS-001')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="viewCampaign('HS-001')">
+                                <i class="fas fa-eye"></i> Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Tab -->
+            <div class="tab-content" id="activeTab">
+                <div class="active-campaign-banner">
+                    <div class="banner-content">
+                        <h2><i class="fas fa-bullhorn"></i> Active Campaign</h2>
+                        <h3>Diabetes Awareness & Screening</h3>
+                        <p><i class="fas fa-map-marker-alt"></i> Barangay Talisay Community Center</p>
+                        <p><i class="fas fa-clock"></i> November 25, 2025 | 8:00 AM - 5:00 PM</p>
+                    </div>
+                    <div class="banner-actions">
+                        <button class="btn btn-success" onclick="manageCampaign('DA-001')">
+                            <i class="fas fa-cog"></i> Manage Campaign
+                        </button>
+                    </div>
+                </div>
+
+                <div class="active-stats-grid">
+                    <div class="active-stat-card">
+                        <h4>Participants</h4>
+                        <div class="stat-value">87 / 150</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 58%;"></div>
+                        </div>
+                        <p class="stat-label">58% of target reached</p>
+                    </div>
+                    <div class="active-stat-card">
+                        <h4>Screening Tests</h4>
+                        <div class="stat-value">73</div>
+                        <p class="stat-label">Blood sugar tests completed</p>
+                    </div>
+                    <div class="active-stat-card">
+                        <h4>Consultations</h4>
+                        <div class="stat-value">42</div>
+                        <p class="stat-label">Doctor consultations</p>
+                    </div>
+                    <div class="active-stat-card">
+                        <h4>Referrals</h4>
+                        <div class="stat-value">12</div>
+                        <p class="stat-label">Patients referred to hospital</p>
+                    </div>
+                </div>
+
+                <div class="participant-registration">
+                    <h3><i class="fas fa-user-plus"></i> Quick Participant Registration</h3>
+                    <form id="participantForm" class="registration-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" class="form-control" placeholder="Enter full name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Age</label>
+                                <input type="number" class="form-control" placeholder="Age" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <select class="form-select" required>
+                                    <option value="">Select...</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Contact Number</label>
+                                <input type="tel" class="form-control" placeholder="+63 XXX XXX XXXX">
+                            </div>
+                            <div class="form-group">
+                                <label>Barangay</label>
+                                <input type="text" class="form-control" placeholder="Barangay">
+                            </div>
+                            <div class="form-group">
+                                <label>Service</label>
+                                <select class="form-select" required>
+                                    <option value="">Select service...</option>
+                                    <option value="screening">Blood Sugar Screening</option>
+                                    <option value="consultation">Doctor Consultation</option>
+                                    <option value="both">Both</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-check"></i> Register Participant
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Completed Tab -->
+            <div class="tab-content" id="completedTab">
+                <div class="completed-table">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Campaign Name</th>
+                                <th>Date</th>
+                                <th>Location</th>
+                                <th>Participants</th>
+                                <th>Services Provided</th>
+                                <th>Success Rate</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>COVID-19 Booster Vaccination</strong></td>
+                                <td>Nov 18, 2025</td>
+                                <td>Brgy. San Nicolas</td>
+                                <td>342</td>
+                                <td>Vaccinations</td>
+                                <td><span class="success-rate high">95%</span></td>
+                                <td>
+                                    <button class="btn-icon" onclick="viewReport('CV-003')" title="View Report">
+                                        <i class="fas fa-file-alt"></i>
+                                    </button>
+                                    <button class="btn-icon" onclick="downloadReport('CV-003')" title="Download">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Free Eye Check-up</strong></td>
+                                <td>Nov 12, 2025</td>
+                                <td>Brgy. Minglanilla</td>
+                                <td>186</td>
+                                <td>Eye Exams, Prescriptions</td>
+                                <td><span class="success-rate high">92%</span></td>
+                                <td>
+                                    <button class="btn-icon" onclick="viewReport('EC-002')" title="View Report">
+                                        <i class="fas fa-file-alt"></i>
+                                    </button>
+                                    <button class="btn-icon" onclick="downloadReport('EC-002')" title="Download">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nutrition Education Seminar</strong></td>
+                                <td>Nov 5, 2025</td>
+                                <td>Brgy. Talisay</td>
+                                <td>124</td>
+                                <td>Seminar, Consultations</td>
+                                <td><span class="success-rate medium">87%</span></td>
+                                <td>
+                                    <button class="btn-icon" onclick="viewReport('NE-001')" title="View Report">
+                                        <i class="fas fa-file-alt"></i>
+                                    </button>
+                                    <button class="btn-icon" onclick="downloadReport('NE-001')" title="Download">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Resources Tab -->
+            <div class="tab-content" id="resourcesTab">
+                <div class="resource-categories">
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <h3><i class="fas fa-syringe"></i> Medical Supplies</h3>
+                            <button class="btn btn-sm btn-primary" onclick="addResource('medical')">
+                                <i class="fas fa-plus"></i> Add Item
+                            </button>
+                        </div>
+                        <div class="resource-items">
+                            <div class="resource-item">
+                                <div class="item-info">
+                                    <h4>COVID-19 Vaccines</h4>
+                                    <p>Moderna Bivalent Booster</p>
+                                </div>
+                                <div class="item-quantity">
+                                    <span class="quantity-value">450</span>
+                                    <span class="quantity-label">doses available</span>
+                                </div>
+                            </div>
+                            <div class="resource-item">
+                                <div class="item-info">
+                                    <h4>Flu Vaccines</h4>
+                                    <p>Seasonal Influenza</p>
+                                </div>
+                                <div class="item-quantity low">
+                                    <span class="quantity-value">85</span>
+                                    <span class="quantity-label">doses available</span>
+                                </div>
+                            </div>
+                            <div class="resource-item">
+                                <div class="item-info">
+                                    <h4>Blood Glucose Test Strips</h4>
+                                    <p>OneTouch Ultra</p>
+                                </div>
+                                <div class="item-quantity">
+                                    <span class="quantity-value">2,400</span>
+                                    <span class="quantity-label">strips available</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <h3><i class="fas fa-users"></i> Personnel</h3>
+                            <button class="btn btn-sm btn-primary" onclick="addResource('personnel')">
+                                <i class="fas fa-plus"></i> Add Personnel
+                            </button>
+                        </div>
+                        <div class="personnel-list">
+                            <div class="personnel-item">
+                                <div class="personnel-avatar">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                                <div class="personnel-info">
+                                    <h4>Dr. Maria Santos</h4>
+                                    <p>General Physician</p>
+                                    <span class="availability available">Available</span>
+                                </div>
+                            </div>
+                            <div class="personnel-item">
+                                <div class="personnel-avatar">
+                                    <i class="fas fa-user-nurse"></i>
+                                </div>
+                                <div class="personnel-info">
+                                    <h4>Nurse Ana Reyes</h4>
+                                    <p>Registered Nurse</p>
+                                    <span class="availability available">Available</span>
+                                </div>
+                            </div>
+                            <div class="personnel-item">
+                                <div class="personnel-avatar">
+                                    <i class="fas fa-tooth"></i>
+                                </div>
+                                <div class="personnel-info">
+                                    <h4>Dr. Carlos Diaz</h4>
+                                    <p>Dentist</p>
+                                    <span class="availability busy">On Assignment</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <h3><i class="fas fa-box"></i> Equipment</h3>
+                            <button class="btn btn-sm btn-primary" onclick="addResource('equipment')">
+                                <i class="fas fa-plus"></i> Add Equipment
+                            </button>
+                        </div>
+                        <div class="equipment-list">
+                            <div class="equipment-item">
+                                <i class="fas fa-stethoscope"></i>
+                                <div class="equipment-info">
+                                    <h4>Stethoscopes</h4>
+                                    <p>12 units available</p>
+                                </div>
+                            </div>
+                            <div class="equipment-item">
+                                <i class="fas fa-heartbeat"></i>
+                                <div class="equipment-info">
+                                    <h4>BP Monitors</h4>
+                                    <p>8 units available</p>
+                                </div>
+                            </div>
+                            <div class="equipment-item">
+                                <i class="fas fa-thermometer"></i>
+                                <div class="equipment-info">
+                                    <h4>Digital Thermometers</h4>
+                                    <p>15 units available</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/dashboard.js"></script>
+    <script src="../js/health-campaigns.js"></script>
+</body>
+</html>
