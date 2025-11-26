@@ -101,13 +101,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize page functionality
 function initializePage() {
+    console.log('Initializing Transport & Referral page...');
     setupTabs();
     setupFilters();
     setupSearch();
     loadUserInfo();
+    createModals();
     renderRequests();
     renderVehicles();
-    createModals();
+    console.log('Page initialized successfully');
 }
 
 // ============================================
@@ -205,10 +207,24 @@ function setupSearch() {
 // ============================================
 
 function openAssignDriverModal(requestId) {
+    console.log('Opening assign driver modal for:', requestId);
     const request = transportRequests.find(r => r.id === requestId);
+    if (!request) {
+        console.error('Request not found:', requestId);
+        showNotification('Request not found!', 'danger');
+        return;
+    }
+    
     const availableVehicles = vehicles.filter(v => v.status === 'available');
+    console.log('Available vehicles:', availableVehicles.length);
     
     const content = document.getElementById('assignDriverContent');
+    if (!content) {
+        console.error('assignDriverContent element not found!');
+        showNotification('Modal content not found!', 'danger');
+        return;
+    }
+    
     content.innerHTML = `
         <div class="assign-info">
             <h4>Request: #${requestId}</h4>
@@ -267,8 +283,20 @@ function confirmAssignment(requestId, vehiclePlate, driverName) {
 }
 
 function viewDetails(requestId) {
+    console.log('Viewing details for:', requestId);
     const request = transportRequests.find(r => r.id === requestId);
+    if (!request) {
+        console.error('Request not found:', requestId);
+        showNotification('Request not found!', 'danger');
+        return;
+    }
+    
     const content = document.getElementById('detailsContent');
+    if (!content) {
+        console.error('detailsContent element not found!');
+        showNotification('Modal content not found!', 'danger');
+        return;
+    }
     
     content.innerHTML = `
         <div class="details-grid">
@@ -490,9 +518,17 @@ function filterHistory() {
 
 function renderRequests(filter = 'all') {
     const grid = document.querySelector('.requests-grid');
-    if (!grid) return;
+    if (!grid) {
+        console.error('Requests grid not found!');
+        return;
+    }
     
     const filtered = filter === 'all' ? transportRequests : transportRequests.filter(r => r.status === filter);
+    
+    if (filtered.length === 0) {
+        grid.innerHTML = '<p class="text-secondary" style="padding: 20px; text-align: center;">No transport requests found.</p>';
+        return;
+    }
     
     grid.innerHTML = filtered.map(request => `
         <div class="request-card" data-status="${request.status}">
@@ -676,6 +712,14 @@ function getVehicleActions(vehicle) {
 // ============================================
 
 function createModals() {
+    console.log('Creating modals...');
+    
+    // Check if modals already exist
+    if (document.getElementById('newRequestModal')) {
+        console.log('Modals already exist, skipping creation');
+        return;
+    }
+    
     const modalsHTML = `
         <!-- New Request Modal -->
         <div id="newRequestModal" class="modal">
@@ -875,6 +919,18 @@ function createModals() {
     `;
     
     document.body.insertAdjacentHTML('beforeend', modalsHTML);
+    console.log('Modals created successfully');
+    
+    // Verify modals exist
+    const modalIds = ['newRequestModal', 'assignDriverModal', 'detailsModal', 'newReferralModal', 'newVehicleModal'];
+    modalIds.forEach(id => {
+        const modal = document.getElementById(id);
+        if (modal) {
+            console.log(`✓ ${id} created`);
+        } else {
+            console.error(`✗ ${id} NOT found`);
+        }
+    });
 }
 
 // ============================================
@@ -952,11 +1008,15 @@ function submitNewVehicle(event) {
 // ============================================
 
 function openModal(modalId) {
+    console.log('Opening modal:', modalId);
     const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
+    if (!modal) {
+        console.error('Modal not found:', modalId);
+        showNotification('Modal not found!', 'danger');
+        return;
     }
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('show'), 10);
 }
 
 function closeModal(modalId) {
