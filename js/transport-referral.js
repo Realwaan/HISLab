@@ -2,6 +2,97 @@
 // TRANSPORT & REFERRAL MODULE
 // ============================================
 
+// Data Storage
+let transportRequests = JSON.parse(localStorage.getItem('transportRequests') || '[]');
+let referrals = JSON.parse(localStorage.getItem('referrals') || '[]');
+let vehicles = JSON.parse(localStorage.getItem('vehicles') || '[]');
+
+// Initialize default data if empty
+if (transportRequests.length === 0) {
+    transportRequests = [
+        {
+            id: 'TR-2025-001',
+            patientName: 'Maria Santos',
+            age: 67,
+            gender: 'Female',
+            from: 'Barangay San Isidro Health Center',
+            to: 'Cebu Provincial Hospital',
+            reason: 'Severe chest pain, possible cardiac event',
+            priority: 'HIGH',
+            status: 'pending',
+            requested: '2025-11-25T14:30:00',
+            driver: null,
+            vehicle: null
+        },
+        {
+            id: 'TR-2025-002',
+            patientName: 'Juan Dela Cruz',
+            age: 45,
+            gender: 'Male',
+            from: 'Clinikabayan Mobile Unit - Talisay',
+            to: 'Vicente Sotto Memorial Medical Center',
+            reason: 'Diabetes management, require specialist consultation',
+            priority: 'MEDIUM',
+            status: 'assigned',
+            requested: '2025-11-25T16:00:00',
+            driver: 'Pedro Garcia',
+            vehicle: 'MB-2301'
+        },
+        {
+            id: 'TR-2025-003',
+            patientName: 'Ana Reyes',
+            age: 32,
+            gender: 'Female',
+            from: 'Barangay Pardo Health Center',
+            to: 'Cebu City Medical Center',
+            reason: 'Prenatal emergency',
+            priority: 'HIGH',
+            status: 'in-transit',
+            requested: '2025-11-25T17:15:00',
+            driver: 'Jose Ramirez',
+            vehicle: 'MB-2302',
+            eta: '15 mins'
+        }
+    ];
+    localStorage.setItem('transportRequests', JSON.stringify(transportRequests));
+}
+
+if (vehicles.length === 0) {
+    vehicles = [
+        {
+            plate: 'MB-2301',
+            name: 'Ambulance Unit 1',
+            type: 'ambulance',
+            driver: 'Pedro Garcia',
+            phone: '+63 912 345 6789',
+            fuel: 85,
+            status: 'available',
+            location: 'Cebu City'
+        },
+        {
+            plate: 'MB-2302',
+            name: 'Ambulance Unit 2',
+            type: 'ambulance',
+            driver: 'Jose Ramirez',
+            phone: '+63 917 654 3210',
+            fuel: 62,
+            status: 'in-use',
+            assignedTo: 'TR-2025-003'
+        },
+        {
+            plate: 'MB-2303',
+            name: 'Mobile Unit Van',
+            type: 'van',
+            driver: 'Maria Torres',
+            phone: '+63 919 876 5432',
+            fuel: 45,
+            status: 'maintenance',
+            returnDate: '2025-11-27'
+        }
+    ];
+    localStorage.setItem('vehicles', JSON.stringify(vehicles));
+}
+
 // Check authentication on page load
 document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
@@ -14,6 +105,9 @@ function initializePage() {
     setupFilters();
     setupSearch();
     loadUserInfo();
+    renderRequests();
+    renderVehicles();
+    createModals();
 }
 
 // ============================================
@@ -60,21 +154,8 @@ function setupFilters() {
             
             // Filter requests
             const status = button.getAttribute('data-status');
-            filterRequests(status);
+            renderRequests(status);
         });
-    });
-}
-
-function filterRequests(status) {
-    const requestCards = document.querySelectorAll('.request-card');
-    
-    requestCards.forEach(card => {
-        if (status === 'all') {
-            card.style.display = 'block';
-        } else {
-            const cardStatus = card.getAttribute('data-status');
-            card.style.display = cardStatus === status ? 'block' : 'none';
-        }
     });
 }
 
@@ -88,12 +169,33 @@ function setupSearch() {
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            const requestCards = document.querySelectorAll('.request-card');
             
-            requestCards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(searchTerm) ? 'block' : 'none';
+            if (!searchTerm) {
+                renderRequests();
+                return;
+            }
+            
+            const filtered = transportRequests.filter(request => {
+                return request.patientName.toLowerCase().includes(searchTerm) ||
+                       request.id.toLowerCase().includes(searchTerm) ||
+                       request.from.toLowerCase().includes(searchTerm) ||
+                       request.to.toLowerCase().includes(searchTerm) ||
+                       request.reason.toLowerCase().includes(searchTerm);
             });
+            
+            const grid = document.querySelector('.requests-grid');
+            if (!grid) return;
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p class="text-secondary">No requests found matching your search.</p>';
+                return;
+            }
+            
+            // Temporarily override transportRequests for rendering
+            const original = transportRequests;
+            transportRequests = filtered;
+            renderRequests();
+            transportRequests = original;
         });
     }
 }
@@ -102,45 +204,189 @@ function setupSearch() {
 // TRANSPORT REQUEST ACTIONS
 // ============================================
 
-function assignDriver(requestId) {
-    // Show modal for driver assignment
-    showNotification('Opening driver assignment for ' + requestId, 'info');
+function openAssignDriverModal(requestId) {
+    const request = transportRequests.find(r => r.id === requestId);
+    const availableVehicles = vehicles.filter(v => v.status === 'available');
     
-    // In a real application, this would open a modal with available drivers
-    const drivers = [
-        { id: 1, name: 'Pedro Garcia', vehicle: 'MB-2301', status: 'Available' },
-        { id: 2, name: 'Jose Ramirez', vehicle: 'MB-2302', status: 'Available' },
-        { id: 3, name: 'Maria Torres', vehicle: 'MB-2303', status: 'Available' }
-    ];
+    const content = document.getElementById('assignDriverContent');
+    content.innerHTML = `
+        <div class="assign-info">
+            <h4>Request: #${requestId}</h4>
+            <p><strong>Patient:</strong> ${request.patientName}</p>
+            <p><strong>From:</strong> ${request.from}</p>
+            <p><strong>To:</strong> ${request.to}</p>
+            <p><strong>Priority:</strong> <span class="priority-${request.priority.toLowerCase()}">${request.priority}</span></p>
+        </div>
+        <hr>
+        <h4>Available Vehicles:</h4>
+        ${availableVehicles.length === 0 ? '<p class="text-secondary">No vehicles currently available</p>' : ''}
+        <div class="vehicle-selection">
+            ${availableVehicles.map(vehicle => `
+                <div class="vehicle-option" onclick="confirmAssignment('${requestId}', '${vehicle.plate}', '${vehicle.driver}')">
+                    <div class="vehicle-option-icon">
+                        <i class="fas fa-${vehicle.type === 'ambulance' ? 'ambulance' : 'van-shuttle'}"></i>
+                    </div>
+                    <div class="vehicle-option-info">
+                        <h5>${vehicle.name} - ${vehicle.plate}</h5>
+                        <p><i class="fas fa-user"></i> ${vehicle.driver}</p>
+                        <p><i class="fas fa-phone"></i> ${vehicle.phone}</p>
+                        <p><i class="fas fa-gas-pump"></i> Fuel: ${vehicle.fuel}%</p>
+                    </div>
+                    <div class="vehicle-option-action">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
     
-    // Simulate assignment
-    setTimeout(() => {
-        showNotification('Driver successfully assigned to ' + requestId, 'success');
-        // Update UI to reflect assignment
-    }, 1000);
+    openModal('assignDriverModal');
+}
+
+function confirmAssignment(requestId, vehiclePlate, driverName) {
+    // Update request
+    const request = transportRequests.find(r => r.id === requestId);
+    request.status = 'assigned';
+    request.driver = driverName;
+    request.vehicle = vehiclePlate;
+    
+    // Update vehicle
+    const vehicle = vehicles.find(v => v.plate === vehiclePlate);
+    vehicle.status = 'assigned';
+    vehicle.assignedTo = requestId;
+    
+    // Save changes
+    localStorage.setItem('transportRequests', JSON.stringify(transportRequests));
+    localStorage.setItem('vehicles', JSON.stringify(vehicles));
+    
+    // Update UI
+    renderRequests();
+    renderVehicles();
+    closeModal('assignDriverModal');
+    showNotification(`Driver ${driverName} assigned successfully!`, 'success');
 }
 
 function viewDetails(requestId) {
-    showNotification('Loading details for ' + requestId, 'info');
-    // In a real application, this would open a modal with full request details
+    const request = transportRequests.find(r => r.id === requestId);
+    const content = document.getElementById('detailsContent');
+    
+    content.innerHTML = `
+        <div class="details-grid">
+            <div class="details-section">
+                <h3><i class="fas fa-info-circle"></i> Request Information</h3>
+                <div class="details-table">
+                    <div class="detail-row">
+                        <span class="detail-label">Request ID:</span>
+                        <span class="detail-value"><strong>#${request.id}</strong></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value"><span class="status-badge status-${request.status}">${formatStatus(request.status)}</span></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Priority:</span>
+                        <span class="detail-value"><span class="priority-${request.priority.toLowerCase()}">${request.priority}</span></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Requested:</span>
+                        <span class="detail-value">${formatDateTime(request.requested)}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="details-section">
+                <h3><i class="fas fa-user-injured"></i> Patient Information</h3>
+                <div class="details-table">
+                    <div class="detail-row">
+                        <span class="detail-label">Name:</span>
+                        <span class="detail-value">${request.patientName}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Age:</span>
+                        <span class="detail-value">${request.age} years old</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Gender:</span>
+                        <span class="detail-value">${request.gender}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="details-section">
+                <h3><i class="fas fa-route"></i> Transport Details</h3>
+                <div class="details-table">
+                    <div class="detail-row">
+                        <span class="detail-label">Pick-up:</span>
+                        <span class="detail-value">${request.from}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Destination:</span>
+                        <span class="detail-value">${request.to}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Reason:</span>
+                        <span class="detail-value">${request.reason}</span>
+                    </div>
+                    ${request.driver ? `
+                        <div class="detail-row">
+                            <span class="detail-label">Driver:</span>
+                            <span class="detail-value">${request.driver}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Vehicle:</span>
+                            <span class="detail-value">${request.vehicle}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    openModal('detailsModal');
 }
 
 function startTransport(requestId) {
-    if (confirm('Start transport for ' + requestId + '?')) {
-        showNotification('Transport started for ' + requestId, 'success');
-        // Update request status to "in-transit"
+    if (confirm('Start transport for request #' + requestId + '?\n\nThe vehicle will begin transporting the patient.')) {
+        const request = transportRequests.find(r => r.id === requestId);
+        request.status = 'in-transit';
+        request.startedAt = new Date().toISOString();
+        request.eta = '25 mins';
+        
+        const vehicle = vehicles.find(v => v.plate === request.vehicle);
+        vehicle.status = 'in-use';
+        
+        localStorage.setItem('transportRequests', JSON.stringify(transportRequests));
+        localStorage.setItem('vehicles', JSON.stringify(vehicles));
+        
+        renderRequests();
+        renderVehicles();
+        showNotification('Transport started successfully! ETA: 25 mins', 'success');
     }
 }
 
 function trackTransport(requestId) {
-    showNotification('Opening live tracking for ' + requestId, 'info');
-    // In a real application, this would open a map with GPS tracking
+    showNotification('Opening GPS tracking...', 'info');
+    setTimeout(() => {
+        alert(`Live GPS Tracking - Request #${requestId}\n\nCurrent Location: En route to destination\nETA: 15 minutes\nSpeed: 45 km/h\n\nIn a production system, this would show a real-time map with GPS coordinates.`);
+    }, 500);
 }
 
 function completeTransport(requestId) {
-    if (confirm('Mark transport ' + requestId + ' as completed?')) {
-        showNotification('Transport completed successfully', 'success');
-        // Update request status to "completed"
+    if (confirm('Mark transport #' + requestId + ' as completed?\n\nThis will update the request status and free up the vehicle.')) {
+        const request = transportRequests.find(r => r.id === requestId);
+        request.status = 'completed';
+        request.completedAt = new Date().toISOString();
+        
+        const vehicle = vehicles.find(v => v.plate === request.vehicle);
+        vehicle.status = 'available';
+        delete vehicle.assignedTo;
+        
+        localStorage.setItem('transportRequests', JSON.stringify(transportRequests));
+        localStorage.setItem('vehicles', JSON.stringify(vehicles));
+        
+        renderRequests();
+        renderVehicles();
+        showNotification('Transport completed successfully!', 'success');
     }
 }
 
@@ -149,24 +395,24 @@ function completeTransport(requestId) {
 // ============================================
 
 function createReferral() {
-    showNotification('Opening referral form', 'info');
-    // In a real application, this would open a form to create a new referral
+    openModal('newReferralModal');
 }
 
 function editReferral(referralId) {
     showNotification('Opening referral ' + referralId + ' for editing', 'info');
-    // In a real application, this would open the referral form with existing data
+    openModal('newReferralModal');
 }
 
 function viewReferral(referralId) {
-    showNotification('Viewing referral ' + referralId, 'info');
-    // In a real application, this would open a modal with referral details
+    alert(`Referral Details - #${referralId}\n\nThis would show complete referral information including:\n- Patient details\n- Referring facility\n- Destination hospital\n- Specialty required\n- Clinical summary\n- Referral status\n- Acceptance confirmation`);
 }
 
 function printReferral(referralId) {
-    showNotification('Printing referral ' + referralId, 'info');
-    // In a real application, this would generate a PDF and open print dialog
-    window.print();
+    showNotification('Generating referral letter...', 'info');
+    setTimeout(() => {
+        alert(`Printing Referral #${referralId}\n\nIn production, this would generate a PDF with:\n- Official referral letter header\n- Patient information\n- Clinical history\n- Reason for referral\n- Physician signature\n- Facility stamps`);
+        window.print();
+    }, 500);
 }
 
 // ============================================
@@ -174,23 +420,57 @@ function printReferral(referralId) {
 // ============================================
 
 function addVehicle() {
-    showNotification('Opening vehicle registration form', 'info');
-    // In a real application, this would open a form to add a new vehicle
+    openModal('newVehicleModal');
 }
 
-function assignToRequest(vehiclePlate) {
-    showNotification('Assigning vehicle ' + vehiclePlate + ' to request', 'info');
-    // In a real application, this would show available requests
+function openAssignVehicleModal(vehiclePlate) {
+    const vehicle = vehicles.find(v => v.plate === vehiclePlate);
+    const pendingRequests = transportRequests.filter(r => r.status === 'pending');
+    
+    if (pendingRequests.length === 0) {
+        showNotification('No pending requests to assign', 'info');
+        return;
+    }
+    
+    const content = document.getElementById('assignDriverContent');
+    content.innerHTML = `
+        <div class="assign-info">
+            <h4>Vehicle: ${vehicle.name} (${vehicle.plate})</h4>
+            <p><strong>Driver:</strong> ${vehicle.driver}</p>
+            <p><strong>Fuel:</strong> ${vehicle.fuel}%</p>
+        </div>
+        <hr>
+        <h4>Pending Requests:</h4>
+        <div class="request-selection">
+            ${pendingRequests.map(request => `
+                <div class="request-option" onclick="confirmAssignment('${request.id}', '${vehicle.plate}', '${vehicle.driver}')">
+                    <div class="request-option-info">
+                        <h5>#${request.id} - ${request.patientName}</h5>
+                        <p><i class="fas fa-map-marker-alt"></i> ${request.from} → ${request.to}</p>
+                        <p><i class="fas fa-exclamation-triangle"></i> Priority: <span class="priority-${request.priority.toLowerCase()}">${request.priority}</span></p>
+                    </div>
+                    <div class="request-option-action">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    
+    openModal('assignDriverModal');
 }
 
 function viewVehicle(vehiclePlate) {
-    showNotification('Loading details for vehicle ' + vehiclePlate, 'info');
-    // In a real application, this would open a modal with vehicle details
+    const vehicle = vehicles.find(v => v.plate === vehiclePlate);
+    alert(`Vehicle Details - ${vehicle.plate}\n\nName: ${vehicle.name}\nType: ${vehicle.type.toUpperCase()}\nDriver: ${vehicle.driver}\nPhone: ${vehicle.phone}\nFuel: ${vehicle.fuel}%\nStatus: ${formatStatus(vehicle.status)}\n${vehicle.location ? 'Location: ' + vehicle.location : ''}\n${vehicle.assignedTo ? 'Assigned to: #' + vehicle.assignedTo : ''}`);
 }
 
 function trackVehicle(vehiclePlate) {
-    showNotification('Opening live tracking for ' + vehiclePlate, 'info');
-    // In a real application, this would open a map with GPS tracking
+    const vehicle = vehicles.find(v => v.plate === vehiclePlate);
+    showNotification('Opening GPS tracking...', 'info');
+    setTimeout(() => {
+        alert(`Live GPS Tracking - ${vehicle.name} (${vehiclePlate})\n\nDriver: ${vehicle.driver}\nStatus: ${formatStatus(vehicle.status)}\n${vehicle.assignedTo ? 'Request: #' + vehicle.assignedTo : ''}\n\nCurrent Location: En route\nSpeed: 45 km/h\nETA: 15 minutes\n\nIn production, this would show a real-time map.`);
+    }, 500);
 }
 
 // ============================================
@@ -201,8 +481,400 @@ function filterHistory() {
     const dateFrom = document.getElementById('dateFrom').value;
     const dateTo = document.getElementById('dateTo').value;
     
-    showNotification('Filtering history from ' + dateFrom + ' to ' + dateTo, 'info');
-    // In a real application, this would fetch and display filtered data
+    showNotification(`Filtering history from ${dateFrom} to ${dateTo}`, 'success');
+}
+
+// ============================================
+// RENDER FUNCTIONS
+// ============================================
+
+function renderRequests(filter = 'all') {
+    const grid = document.querySelector('.requests-grid');
+    if (!grid) return;
+    
+    const filtered = filter === 'all' ? transportRequests : transportRequests.filter(r => r.status === filter);
+    
+    grid.innerHTML = filtered.map(request => `
+        <div class="request-card" data-status="${request.status}">
+            <div class="request-header">
+                <div class="request-id">
+                    <span class="label">Request ID:</span>
+                    <span class="value">#${request.id}</span>
+                </div>
+                <span class="status-badge status-${request.status}">${formatStatus(request.status)}</span>
+            </div>
+            <div class="request-body">
+                <div class="patient-info">
+                    <h4><i class="fas fa-user-injured"></i> ${request.patientName}</h4>
+                    <p class="text-secondary">Age: ${request.age} | ${request.gender}</p>
+                </div>
+                <div class="transport-details">
+                    <div class="detail-row">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div><strong>From:</strong> ${request.from}</div>
+                    </div>
+                    <div class="detail-row">
+                        <i class="fas fa-hospital"></i>
+                        <div><strong>To:</strong> ${request.to}</div>
+                    </div>
+                    <div class="detail-row">
+                        <i class="fas fa-notes-medical"></i>
+                        <div><strong>Reason:</strong> ${request.reason}</div>
+                    </div>
+                    ${request.driver ? `
+                        <div class="detail-row">
+                            <i class="fas fa-user-md"></i>
+                            <div><strong>Driver:</strong> ${request.driver} - Vehicle: ${request.vehicle}</div>
+                        </div>
+                    ` : ''}
+                    ${request.eta ? `
+                        <div class="detail-row">
+                            <i class="fas fa-route"></i>
+                            <div><strong>Status:</strong> En route - ETA ${request.eta}</div>
+                        </div>
+                    ` : ''}
+                    <div class="detail-row">
+                        <i class="fas fa-clock"></i>
+                        <div><strong>Requested:</strong> ${formatDateTime(request.requested)}</div>
+                    </div>
+                    <div class="detail-row">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div><strong>Priority:</strong> <span class="priority-${request.priority.toLowerCase()}">${request.priority} ${request.priority === 'HIGH' ? '- Emergency' : ''}</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="request-footer">
+                ${getRequestActions(request)}
+            </div>
+        </div>
+    `).join('');
+}
+
+function getRequestActions(request) {
+    switch(request.status) {
+        case 'pending':
+            return `
+                <button class="btn btn-primary btn-sm" onclick="openAssignDriverModal('${request.id}')">
+                    <i class="fas fa-user-check"></i> Assign Driver
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="viewDetails('${request.id}')">
+                    <i class="fas fa-eye"></i> View Details
+                </button>
+            `;
+        case 'assigned':
+            return `
+                <button class="btn btn-success btn-sm" onclick="startTransport('${request.id}')">
+                    <i class="fas fa-play"></i> Start Transport
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="viewDetails('${request.id}')">
+                    <i class="fas fa-eye"></i> View Details
+                </button>
+            `;
+        case 'in-transit':
+            return `
+                <button class="btn btn-info btn-sm" onclick="trackTransport('${request.id}')">
+                    <i class="fas fa-map-marked-alt"></i> Track Location
+                </button>
+                <button class="btn btn-success btn-sm" onclick="completeTransport('${request.id}')">
+                    <i class="fas fa-check"></i> Complete
+                </button>
+            `;
+        default:
+            return `
+                <button class="btn btn-secondary btn-sm" onclick="viewDetails('${request.id}')">
+                    <i class="fas fa-eye"></i> View Details
+                </button>
+            `;
+    }
+}
+
+function renderVehicles() {
+    const grid = document.querySelector('.vehicles-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = vehicles.map(vehicle => `
+        <div class="vehicle-card ${vehicle.status}">
+            <div class="vehicle-header">
+                <div class="vehicle-icon">
+                    <i class="fas fa-${vehicle.type === 'ambulance' ? 'ambulance' : 'van-shuttle'}"></i>
+                </div>
+                <span class="vehicle-status status-${vehicle.status}">${formatStatus(vehicle.status)}</span>
+            </div>
+            <div class="vehicle-body">
+                <h4>${vehicle.name}</h4>
+                <p class="vehicle-plate">${vehicle.plate}</p>
+                <div class="vehicle-details">
+                    <div class="detail-item">
+                        <i class="fas fa-user"></i>
+                        <span>${vehicle.driver}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-phone"></i>
+                        <span>${vehicle.phone}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-gas-pump"></i>
+                        <span>Fuel: ${vehicle.fuel}%</span>
+                    </div>
+                    ${vehicle.location ? `
+                        <div class="detail-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Location: ${vehicle.location}</span>
+                        </div>
+                    ` : ''}
+                    ${vehicle.assignedTo ? `
+                        <div class="detail-item">
+                            <i class="fas fa-route"></i>
+                            <span>Request: #${vehicle.assignedTo}</span>
+                        </div>
+                    ` : ''}
+                    ${vehicle.returnDate ? `
+                        <div class="detail-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Return: ${formatDate(vehicle.returnDate)}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+            <div class="vehicle-footer">
+                ${getVehicleActions(vehicle)}
+            </div>
+        </div>
+    `).join('');
+}
+
+function getVehicleActions(vehicle) {
+    if (vehicle.status === 'available') {
+        return `
+            <button class="btn btn-sm btn-secondary" onclick="openAssignVehicleModal('${vehicle.plate}')">
+                <i class="fas fa-tasks"></i> Assign
+            </button>
+            <button class="btn btn-sm btn-info" onclick="viewVehicle('${vehicle.plate}')">
+                <i class="fas fa-info-circle"></i> Details
+            </button>
+        `;
+    } else if (vehicle.status === 'in-use') {
+        return `
+            <button class="btn btn-sm btn-info" onclick="trackVehicle('${vehicle.plate}')">
+                <i class="fas fa-map-marked-alt"></i> Track
+            </button>
+            <button class="btn btn-sm btn-secondary" onclick="viewVehicle('${vehicle.plate}')">
+                <i class="fas fa-info-circle"></i> Details
+            </button>
+        `;
+    } else {
+        return `
+            <button class="btn btn-sm btn-secondary" onclick="viewVehicle('${vehicle.plate}')">
+                <i class="fas fa-info-circle"></i> Details
+            </button>
+        `;
+    }
+}
+
+// ============================================
+// MODAL CREATION
+// ============================================
+
+function createModals() {
+    const modalsHTML = `
+        <!-- New Request Modal -->
+        <div id="newRequestModal" class="modal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2><i class="fas fa-ambulance"></i> New Transport Request</h2>
+                    <button class="btn-close" onclick="closeModal('newRequestModal')">&times;</button>
+                </div>
+                <form id="newRequestForm" onsubmit="submitNewRequest(event)">
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Patient Name *</label>
+                                <input type="text" name="patientName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Age *</label>
+                                <input type="number" name="age" required min="0" max="150">
+                            </div>
+                            <div class="form-group">
+                                <label>Gender *</label>
+                                <select name="gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Pick-up Location *</label>
+                            <input type="text" name="from" required placeholder="Barangay / Health Center">
+                        </div>
+                        <div class="form-group">
+                            <label>Destination Hospital *</label>
+                            <input type="text" name="to" required placeholder="Hospital name">
+                        </div>
+                        <div class="form-group">
+                            <label>Reason for Transport *</label>
+                            <textarea name="reason" required rows="3" placeholder="Medical condition or reason for referral"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Priority Level *</label>
+                            <select name="priority" required>
+                                <option value="">Select Priority</option>
+                                <option value="LOW">Low - Routine</option>
+                                <option value="MEDIUM">Medium - Scheduled</option>
+                                <option value="HIGH">High - Emergency</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('newRequestModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Create Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Assign Driver Modal -->
+        <div id="assignDriverModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-user-check"></i> Assign Driver & Vehicle</h2>
+                    <button class="btn-close" onclick="closeModal('assignDriverModal')">&times;</button>
+                </div>
+                <div class="modal-body" id="assignDriverContent">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Request Details Modal -->
+        <div id="detailsModal" class="modal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2><i class="fas fa-file-medical-alt"></i> Transport Request Details</h2>
+                    <button class="btn-close" onclick="closeModal('detailsModal')">&times;</button>
+                </div>
+                <div class="modal-body" id="detailsContent">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- New Referral Modal -->
+        <div id="newReferralModal" class="modal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2><i class="fas fa-file-medical"></i> Create Hospital Referral</h2>
+                    <button class="btn-close" onclick="closeModal('newReferralModal')">&times;</button>
+                </div>
+                <form id="newReferralForm" onsubmit="submitNewReferral(event)">
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Patient Name *</label>
+                                <input type="text" name="patientName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Age *</label>
+                                <input type="number" name="age" required min="0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Referring Facility *</label>
+                            <input type="text" name="fromFacility" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Referral Hospital *</label>
+                            <input type="text" name="toHospital" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Specialty Required *</label>
+                            <select name="specialty" required>
+                                <option value="">Select Specialty</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <option value="OB-GYN">OB-GYN</option>
+                                <option value="Orthopedics">Orthopedics</option>
+                                <option value="Pediatrics">Pediatrics</option>
+                                <option value="Surgery">Surgery</option>
+                                <option value="Internal Medicine">Internal Medicine</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Clinical Summary *</label>
+                            <textarea name="summary" required rows="4" placeholder="Patient's medical history, symptoms, and reason for referral"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Priority *</label>
+                            <select name="priority" required>
+                                <option value="LOW">Low</option>
+                                <option value="MEDIUM">Medium</option>
+                                <option value="HIGH">High</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('newReferralModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Create Referral
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- New Vehicle Modal -->
+        <div id="newVehicleModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-plus"></i> Add New Vehicle</h2>
+                    <button class="btn-close" onclick="closeModal('newVehicleModal')">&times;</button>
+                </div>
+                <form id="newVehicleForm" onsubmit="submitNewVehicle(event)">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Vehicle Name *</label>
+                            <input type="text" name="name" required placeholder="e.g., Ambulance Unit 4">
+                        </div>
+                        <div class="form-group">
+                            <label>Plate Number *</label>
+                            <input type="text" name="plate" required placeholder="e.g., MB-2304">
+                        </div>
+                        <div class="form-group">
+                            <label>Vehicle Type *</label>
+                            <select name="type" required>
+                                <option value="">Select Type</option>
+                                <option value="ambulance">Ambulance</option>
+                                <option value="van">Van</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Driver Name *</label>
+                            <input type="text" name="driver" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Driver Phone *</label>
+                            <input type="tel" name="phone" required placeholder="+63">
+                        </div>
+                        <div class="form-group">
+                            <label>Current Location</label>
+                            <input type="text" name="location" placeholder="e.g., Cebu City">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('newVehicleModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Add Vehicle
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalsHTML);
 }
 
 // ============================================
@@ -210,16 +882,134 @@ function filterHistory() {
 // ============================================
 
 document.getElementById('btnNewRequest')?.addEventListener('click', function() {
-    showNotification('Opening new transport request form', 'info');
-    // In a real application, this would open a form to create a new transport request
+    openModal('newRequestModal');
+});
+
+function submitNewRequest(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    const newRequest = {
+        id: `TR-2025-${String(transportRequests.length + 1).padStart(3, '0')}`,
+        patientName: formData.get('patientName'),
+        age: parseInt(formData.get('age')),
+        gender: formData.get('gender'),
+        from: formData.get('from'),
+        to: formData.get('to'),
+        reason: formData.get('reason'),
+        priority: formData.get('priority'),
+        status: 'pending',
+        requested: new Date().toISOString(),
+        driver: null,
+        vehicle: null
+    };
+    
+    transportRequests.push(newRequest);
+    localStorage.setItem('transportRequests', JSON.stringify(transportRequests));
+    
+    renderRequests();
+    closeModal('newRequestModal');
+    form.reset();
+    showNotification('Transport request created successfully!', 'success');
+}
+
+function submitNewReferral(event) {
+    event.preventDefault();
+    const form = event.target;
+    showNotification('Referral created successfully!', 'success');
+    closeModal('newReferralModal');
+    form.reset();
+}
+
+function submitNewVehicle(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    const newVehicle = {
+        plate: formData.get('plate'),
+        name: formData.get('name'),
+        type: formData.get('type'),
+        driver: formData.get('driver'),
+        phone: formData.get('phone'),
+        fuel: 100,
+        status: 'available',
+        location: formData.get('location') || 'Base'
+    };
+    
+    vehicles.push(newVehicle);
+    localStorage.setItem('vehicles', JSON.stringify(vehicles));
+    
+    renderVehicles();
+    closeModal('newVehicleModal');
+    form.reset();
+    showNotification('Vehicle added successfully!', 'success');
+}
+
+// ============================================
+// MODAL FUNCTIONS
+// ============================================
+
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = 'none', 300);
+    }
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.classList.remove('show');
+        setTimeout(() => event.target.style.display = 'none', 300);
+    }
 });
 
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
 
+function formatStatus(status) {
+    const statusMap = {
+        'pending': 'Pending',
+        'assigned': 'Assigned',
+        'in-transit': 'In Transit',
+        'in-use': 'In Use',
+        'completed': 'Completed',
+        'available': 'Available',
+        'maintenance': 'Maintenance'
+    };
+    return statusMap[status] || status;
+}
+
+function formatDateTime(dateString) {
+    const date = new Date(dateString);
+    const options = { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+    return date.toLocaleDateString('en-US', options);
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
 function showNotification(message, type = 'info') {
-    // Create notification element
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.style.cssText = `
@@ -238,7 +1028,6 @@ function showNotification(message, type = 'info') {
     
     document.body.appendChild(notification);
     
-    // Remove after 3 seconds
     setTimeout(() => {
         notification.style.animation = 'slideOutRight 0.3s ease';
         setTimeout(() => notification.remove(), 300);
