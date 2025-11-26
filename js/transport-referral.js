@@ -97,6 +97,7 @@ if (vehicles.length === 0) {
 document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
     initializePage();
+    setupNewRequestButton();
 });
 
 // Initialize page functionality
@@ -110,6 +111,20 @@ function initializePage() {
     renderRequests();
     renderVehicles();
     console.log('Page initialized successfully');
+}
+
+// Setup New Request Button
+function setupNewRequestButton() {
+    const btnNewRequest = document.getElementById('btnNewRequest');
+    if (btnNewRequest) {
+        btnNewRequest.addEventListener('click', function() {
+            console.log('New Request button clicked');
+            openModal('newRequestModal');
+        });
+        console.log('New Request button handler attached');
+    } else {
+        console.error('btnNewRequest not found!');
+    }
 }
 
 // ============================================
@@ -937,10 +952,6 @@ function createModals() {
 // NEW REQUEST
 // ============================================
 
-document.getElementById('btnNewRequest')?.addEventListener('click', function() {
-    openModal('newRequestModal');
-});
-
 function submitNewRequest(event) {
     event.preventDefault();
     const form = event.target;
@@ -1121,6 +1132,31 @@ function logout() {
         window.location.href = '../index.html';
     }
 }
+
+// Expose functions globally for onclick/onsubmit handlers
+window.openAssignDriverModal = openAssignDriverModal;
+window.viewDetails = viewDetails;
+window.startTransport = startTransport;
+window.trackTransport = trackTransport;
+window.completeTransport = completeTransport;
+window.createReferral = createReferral;
+window.editReferral = editReferral;
+window.viewReferral = viewReferral;
+window.printReferral = printReferral;
+window.addVehicle = addVehicle;
+window.openAssignVehicleModal = openAssignVehicleModal;
+window.viewVehicle = viewVehicle;
+window.trackVehicle = trackVehicle;
+window.filterHistory = filterHistory;
+window.confirmAssignment = confirmAssignment;
+window.submitNewRequest = submitNewRequest;
+window.submitNewReferral = submitNewReferral;
+window.submitNewVehicle = submitNewVehicle;
+window.closeModal = closeModal;
+window.openModal = openModal;
+window.logout = logout;
+
+console.log('All functions exposed globally');
 
 // Add animation styles
 const style = document.createElement('style');
