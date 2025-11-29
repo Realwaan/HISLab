@@ -374,8 +374,70 @@ function setupEventListeners() {
 // View patient details
 function viewPatient(patientId) {
     console.log('Viewing patient:', patientId);
-    // In real app, this would open a detailed patient modal or navigate to patient page
-    alert(`Opening patient record for Patient ID: ${patientId}\n\nIn the full application, this would show:\n- Complete medical history\n- Test results\n- Prescriptions\n- Upcoming appointments`);
+    // For demo static patients, show demo data
+    const demoPatients = {
+        1: {
+            id: 'CK-2025-001',
+            firstName: 'Maria',
+            lastName: 'Santos',
+            age: 34,
+            gender: 'Female',
+            address: 'Barangay San Jose, Cebu City',
+            phone: '+63 917 123 4567',
+            email: 'maria.santos@email.com',
+            bloodType: 'O+',
+            status: 'Active',
+            lastVisit: '2025-11-20',
+            condition: 'Prenatal Care',
+            allergies: 'None known',
+            medications: ['Folic Acid 400mcg daily', 'Iron Supplement'],
+            vitalSigns: { bp: '110/70', hr: '78 bpm', temp: '36.5°C', weight: '58 kg' },
+            history: ['Prenatal checkup - Nov 20, 2025', 'Blood test - Nov 15, 2025', 'Initial consultation - Oct 28, 2025']
+        },
+        2: {
+            id: 'CK-2025-002',
+            firstName: 'Juan',
+            lastName: 'Reyes',
+            age: 56,
+            gender: 'Male',
+            address: 'Barangay Talamban, Cebu City',
+            phone: '+63 918 234 5678',
+            email: 'juan.reyes@email.com',
+            bloodType: 'A+',
+            status: 'Ongoing',
+            lastVisit: '2025-11-24',
+            condition: 'Hypertension Management',
+            allergies: 'Penicillin',
+            medications: ['Losartan 50mg daily', 'Amlodipine 5mg daily'],
+            vitalSigns: { bp: '140/90', hr: '82 bpm', temp: '36.8°C', weight: '75 kg' },
+            history: ['BP monitoring - Nov 24, 2025', 'Medication adjustment - Nov 10, 2025', 'Lab work - Nov 5, 2025']
+        },
+        3: {
+            id: 'CK-2025-003',
+            firstName: 'Ana',
+            lastName: 'Lopez',
+            age: 12,
+            gender: 'Female',
+            address: 'Sitio Maharlika, Mandaue City',
+            phone: '+63 919 345 6789',
+            email: 'parent@email.com',
+            bloodType: 'B+',
+            status: 'Active',
+            lastVisit: '2025-11-22',
+            condition: 'Vaccination (MMR)',
+            allergies: 'None known',
+            medications: ['Multivitamins'],
+            vitalSigns: { bp: '100/65', hr: '88 bpm', temp: '36.4°C', weight: '38 kg' },
+            history: ['MMR Vaccination - Nov 22, 2025', 'Health screening - Oct 15, 2025', 'Dental checkup - Sep 20, 2025']
+        }
+    };
+    
+    const patient = demoPatients[patientId];
+    if (patient) {
+        showPatientDetailsModal(patient);
+    } else {
+        showNotification('Patient not found', 'warning');
+    }
 }
 
 // ============================================
@@ -994,31 +1056,203 @@ function viewPatientDetails(patientId) {
 
 // Show patient details modal
 function showPatientModal(patient) {
-    
-    // Show patient details in a modal or alert
-    const details = `
-Patient Details
-
-ID: ${patient.id || patient._id || patient.patientId || 'N/A'}
-Name: ${patient.firstName || ''} ${patient.lastName || ''}
-Age: ${patient.age || 'N/A'}
-Gender: ${patient.gender || 'N/A'}
-Address: ${patient.address || 'N/A'}
-Phone: ${patient.phone || patient.contactNumber || 'N/A'}
-Last Visit: ${patient.lastVisit ? formatDate(patient.lastVisit) : 'N/A'}
-Status: ${patient.status || 'N/A'}
-Condition: ${patient.condition || 'N/A'}
-
-In the full application, this would open a detailed modal with:
-- Complete medical history
-- Vital signs chart
-- Lab results
-- Prescriptions
-- Appointment history
-    `.trim();
-    
-    alert(details);
+    showPatientDetailsModal(patient);
 }
+
+// Beautiful Patient Details Modal
+function showPatientDetailsModal(patient) {
+    const statusColor = patient.status === 'Active' || patient.status === 'active' ? '#4CAF50' : 
+                        patient.status === 'Ongoing' || patient.status === 'ongoing' ? '#FF9800' : '#2196F3';
+    
+    const historyHTML = (patient.history || []).map(h => `
+        <div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
+            <i class="fas fa-circle" style="color: #00897B; font-size: 8px; margin-top: 6px;"></i>
+            <span style="color: #555; font-size: 13px;">${h}</span>
+        </div>
+    `).join('') || '<p style="color: #999; font-size: 13px;">No history available</p>';
+    
+    const medicationsHTML = (patient.medications || []).map(m => `
+        <span style="display: inline-block; padding: 6px 12px; background: #E3F2FD; color: #1565C0; border-radius: 20px; font-size: 12px; margin: 4px 4px 4px 0;">
+            <i class="fas fa-pills" style="margin-right: 6px;"></i>${m}
+        </span>
+    `).join('') || '<p style="color: #999; font-size: 13px;">No medications</p>';
+    
+    const modalContent = `
+        <div class="modal-header" style="background: linear-gradient(135deg, #00695C 0%, #00897B 100%); padding: 28px 32px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -50%; right: -30px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; animation: floatGently 8s ease-in-out infinite;"></div>
+            <div style="position: absolute; bottom: -60%; left: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.08); border-radius: 50%; animation: floatGently 6s ease-in-out infinite reverse;"></div>
+            <div style="display: flex; align-items: center; gap: 18px; position: relative; z-index: 1;">
+                <div style="width: 70px; height: 70px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); border: 3px solid rgba(255,255,255,0.3);">
+                    <i class="fas fa-user" style="font-size: 32px; color: white;"></i>
+                </div>
+                <div>
+                    <h2 style="margin: 0; color: white; font-size: 24px; font-weight: 600; animation: slideInFromLeft 0.5s ease-out;">${patient.firstName || ''} ${patient.lastName || ''}</h2>
+                    <p style="margin: 6px 0 0 0; color: rgba(255,255,255,0.85); font-size: 14px;">
+                        <span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; margin-right: 10px;">ID: ${patient.id || patient._id || 'N/A'}</span>
+                        <span style="background: ${statusColor}; padding: 4px 10px; border-radius: 12px;">${patient.status || 'Active'}</span>
+                    </p>
+                </div>
+            </div>
+            <button onclick="closePatientDetailsModal()" style="position: absolute; top: 20px; right: 20px; width: 38px; height: 38px; border-radius: 50%; border: none; background: rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); backdrop-filter: blur(4px);" onmouseover="this.style.background='rgba(255,255,255,0.35)';this.style.transform='rotate(90deg) scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.2)';this.style.transform='rotate(0deg) scale(1)'">×</button>
+        </div>
+        
+        <div class="modal-body" style="padding: 0; max-height: 60vh; overflow-y: auto; background: #f8f9fa;">
+            <!-- Quick Info Bar -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; background: white; border-bottom: 1px solid #eee;">
+                <div style="padding: 16px; text-align: center; border-right: 1px solid #eee; animation: fadeInUp 0.4s ease-out 0.1s both;">
+                    <i class="fas fa-birthday-cake" style="color: #00897B; font-size: 20px; margin-bottom: 6px; display: block;"></i>
+                    <p style="margin: 0; color: #333; font-weight: 600; font-size: 15px;">${patient.age || 'N/A'}</p>
+                    <p style="margin: 2px 0 0; color: #888; font-size: 11px;">Years Old</p>
+                </div>
+                <div style="padding: 16px; text-align: center; border-right: 1px solid #eee; animation: fadeInUp 0.4s ease-out 0.2s both;">
+                    <i class="fas fa-venus-mars" style="color: #E91E63; font-size: 20px; margin-bottom: 6px; display: block;"></i>
+                    <p style="margin: 0; color: #333; font-weight: 600; font-size: 15px;">${patient.gender || 'N/A'}</p>
+                    <p style="margin: 2px 0 0; color: #888; font-size: 11px;">Gender</p>
+                </div>
+                <div style="padding: 16px; text-align: center; border-right: 1px solid #eee; animation: fadeInUp 0.4s ease-out 0.3s both;">
+                    <i class="fas fa-tint" style="color: #F44336; font-size: 20px; margin-bottom: 6px; display: block;"></i>
+                    <p style="margin: 0; color: #333; font-weight: 600; font-size: 15px;">${patient.bloodType || 'N/A'}</p>
+                    <p style="margin: 2px 0 0; color: #888; font-size: 11px;">Blood Type</p>
+                </div>
+                <div style="padding: 16px; text-align: center; animation: fadeInUp 0.4s ease-out 0.4s both;">
+                    <i class="fas fa-calendar-check" style="color: #2196F3; font-size: 20px; margin-bottom: 6px; display: block;"></i>
+                    <p style="margin: 0; color: #333; font-weight: 600; font-size: 15px;">${patient.lastVisit ? formatDate(patient.lastVisit) : 'N/A'}</p>
+                    <p style="margin: 2px 0 0; color: #888; font-size: 11px;">Last Visit</p>
+                </div>
+            </div>
+            
+            <div style="padding: 24px 28px;">
+                <!-- Contact Information -->
+                <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); animation: formFieldSlide 0.4s ease-out 0.2s both;">
+                    <h4 style="margin: 0 0 14px 0; color: #00695C; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-address-card"></i> Contact Information
+                    </h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                            <i class="fas fa-phone" style="color: #00897B; width: 20px;"></i>
+                            <span style="color: #555; font-size: 13px;">${patient.phone || 'N/A'}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                            <i class="fas fa-envelope" style="color: #00897B; width: 20px;"></i>
+                            <span style="color: #555; font-size: 13px;">${patient.email || 'N/A'}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #f8f9fa; border-radius: 8px; grid-column: 1 / -1;">
+                            <i class="fas fa-map-marker-alt" style="color: #00897B; width: 20px;"></i>
+                            <span style="color: #555; font-size: 13px;">${patient.address || 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Vital Signs -->
+                <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); animation: formFieldSlide 0.4s ease-out 0.3s both;">
+                    <h4 style="margin: 0 0 14px 0; color: #00695C; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-heartbeat"></i> Latest Vital Signs
+                    </h4>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                        <div style="text-align: center; padding: 14px; background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); border-radius: 10px;">
+                            <i class="fas fa-heart" style="color: #43A047; font-size: 18px;"></i>
+                            <p style="margin: 8px 0 2px; font-weight: 600; color: #2E7D32; font-size: 14px;">${patient.vitalSigns?.bp || 'N/A'}</p>
+                            <p style="margin: 0; color: #66BB6A; font-size: 10px; text-transform: uppercase;">Blood Pressure</p>
+                        </div>
+                        <div style="text-align: center; padding: 14px; background: linear-gradient(135deg, #FCE4EC 0%, #F8BBD9 100%); border-radius: 10px;">
+                            <i class="fas fa-pulse" style="color: #D81B60; font-size: 18px;"></i>
+                            <p style="margin: 8px 0 2px; font-weight: 600; color: #AD1457; font-size: 14px;">${patient.vitalSigns?.hr || 'N/A'}</p>
+                            <p style="margin: 0; color: #EC407A; font-size: 10px; text-transform: uppercase;">Heart Rate</p>
+                        </div>
+                        <div style="text-align: center; padding: 14px; background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); border-radius: 10px;">
+                            <i class="fas fa-thermometer-half" style="color: #1976D2; font-size: 18px;"></i>
+                            <p style="margin: 8px 0 2px; font-weight: 600; color: #1565C0; font-size: 14px;">${patient.vitalSigns?.temp || 'N/A'}</p>
+                            <p style="margin: 0; color: #42A5F5; font-size: 10px; text-transform: uppercase;">Temperature</p>
+                        </div>
+                        <div style="text-align: center; padding: 14px; background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); border-radius: 10px;">
+                            <i class="fas fa-weight" style="color: #EF6C00; font-size: 18px;"></i>
+                            <p style="margin: 8px 0 2px; font-weight: 600; color: #E65100; font-size: 14px;">${patient.vitalSigns?.weight || 'N/A'}</p>
+                            <p style="margin: 0; color: #FB8C00; font-size: 10px; text-transform: uppercase;">Weight</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Medical Info -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); animation: formFieldSlide 0.4s ease-out 0.4s both;">
+                        <h4 style="margin: 0 0 12px 0; color: #F44336; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-exclamation-triangle"></i> Allergies
+                        </h4>
+                        <p style="margin: 0; color: #555; font-size: 13px; padding: 10px; background: #FFF3F3; border-radius: 8px; border-left: 3px solid #F44336;">${patient.allergies || 'None known'}</p>
+                    </div>
+                    <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); animation: formFieldSlide 0.4s ease-out 0.45s both;">
+                        <h4 style="margin: 0 0 12px 0; color: #9C27B0; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-notes-medical"></i> Current Condition
+                        </h4>
+                        <p style="margin: 0; color: #555; font-size: 13px; padding: 10px; background: #F3E5F5; border-radius: 8px; border-left: 3px solid #9C27B0;">${patient.condition || 'General checkup'}</p>
+                    </div>
+                </div>
+                
+                <!-- Medications -->
+                <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); animation: formFieldSlide 0.4s ease-out 0.5s both;">
+                    <h4 style="margin: 0 0 12px 0; color: #1565C0; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-prescription-bottle-alt"></i> Current Medications
+                    </h4>
+                    <div>${medicationsHTML}</div>
+                </div>
+                
+                <!-- Visit History -->
+                <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); animation: formFieldSlide 0.4s ease-out 0.55s both;">
+                    <h4 style="margin: 0 0 12px 0; color: #00695C; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-history"></i> Recent Visit History
+                    </h4>
+                    <div>${historyHTML}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="padding: 20px 28px; background: white; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 12px; animation: fadeInUp 0.5s ease-out 0.6s both;">
+            <button onclick="closePatientDetailsModal()" style="padding: 12px 24px; border: 2px solid #e0e0e0; border-radius: 10px; background: white; color: #666; font-weight: 600; cursor: pointer; font-size: 13px; transition: all 0.3s; display: flex; align-items: center; gap: 8px;" onmouseover="this.style.background='#f5f5f5';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='white';this.style.transform='translateY(0)'">
+                <i class="fas fa-times"></i> Close
+            </button>
+            <button onclick="closePatientDetailsModal(); openNewPatientForm();" style="padding: 12px 24px; border: none; border-radius: 10px; background: linear-gradient(135deg, #00897B 0%, #00695C 100%); color: white; font-weight: 600; cursor: pointer; font-size: 13px; transition: all 0.3s; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,137,123,0.3);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0,137,123,0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 15px rgba(0,137,123,0.3)'">
+                <i class="fas fa-edit"></i> Edit Record
+            </button>
+        </div>
+    `;
+    
+    // Create or get modal
+    let modal = document.getElementById('patientDetailsModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'patientDetailsModal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-overlay" onclick="closePatientDetailsModal()"></div>
+            <div class="modal-content" id="patientDetailsContent" style="max-width: 700px; border-radius: 20px; overflow: hidden; box-shadow: 0 25px 80px rgba(0,0,0,0.3);"></div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    const content = document.getElementById('patientDetailsContent');
+    if (content) {
+        content.innerHTML = modalContent;
+    }
+    
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+}
+
+function closePatientDetailsModal() {
+    const modal = document.getElementById('patientDetailsModal');
+    if (modal) {
+        const content = modal.querySelector('.modal-content');
+        if (content) content.classList.add('closing');
+        modal.classList.add('closing');
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+            modal.classList.remove('active', 'closing');
+            if (content) content.classList.remove('closing');
+        }, 300);
+    }
+}
+window.closePatientDetailsModal = closePatientDetailsModal;
 
 // Edit supply
 function editSupply(supplyId) {
