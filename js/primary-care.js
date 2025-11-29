@@ -902,9 +902,6 @@ window.viewPatient = viewPatient;
 window.viewTestInfo = viewTestInfo;
 window.searchPatients = searchPatients;
 window.filterPatientsByStatus = filterPatientsByStatus;
-window.openAddSupplyForm = openAddSupplyForm;
-window.openAddVolunteerForm = openAddVolunteerForm;
-window.openAddTestForm = openAddTestForm;
 window.editSupply = editSupply;
 window.contactVolunteer = contactVolunteer;
 window.viewVolunteerDetails = viewVolunteerDetails;
@@ -1099,16 +1096,21 @@ function openAddSupplyForm() {
     const modal = document.getElementById('addSupplyModal');
     if (modal) {
         modal.style.display = 'flex';
-        document.getElementById('addSupplyForm').reset();
+        modal.classList.add('active');
+        const form = document.getElementById('addSupplyForm');
+        if (form) form.reset();
     }
 }
+window.openAddSupplyForm = openAddSupplyForm;
 
 function closeAddSupplyModal() {
     const modal = document.getElementById('addSupplyModal');
     if (modal) {
         modal.style.display = 'none';
+        modal.classList.remove('active');
     }
 }
+window.closeAddSupplyModal = closeAddSupplyModal;
 
 async function saveNewSupply() {
     const name = document.getElementById('supplyName').value.trim();
@@ -1153,6 +1155,7 @@ async function saveNewSupply() {
     closeAddSupplyModal();
     showNotification(`${name} added successfully!`, 'success');
 }
+window.saveNewSupply = saveNewSupply;
 
 // ============================================
 // ADD VOLUNTEER MODAL FUNCTIONS
@@ -1162,16 +1165,21 @@ function openAddVolunteerForm() {
     const modal = document.getElementById('addVolunteerModal');
     if (modal) {
         modal.style.display = 'flex';
-        document.getElementById('addVolunteerForm').reset();
+        modal.classList.add('active');
+        const form = document.getElementById('addVolunteerForm');
+        if (form) form.reset();
     }
 }
+window.openAddVolunteerForm = openAddVolunteerForm;
 
 function closeAddVolunteerModal() {
     const modal = document.getElementById('addVolunteerModal');
     if (modal) {
         modal.style.display = 'none';
+        modal.classList.remove('active');
     }
 }
+window.closeAddVolunteerModal = closeAddVolunteerModal;
 
 function saveNewVolunteer() {
     const name = document.getElementById('volunteerName').value.trim();
@@ -1201,6 +1209,7 @@ function saveNewVolunteer() {
     closeAddVolunteerModal();
     showNotification(`${name} added successfully!`, 'success');
 }
+window.saveNewVolunteer = saveNewVolunteer;
 
 // ============================================
 // ADD TEST MODAL FUNCTIONS
@@ -1210,16 +1219,21 @@ function openAddTestForm() {
     const modal = document.getElementById('addTestModal');
     if (modal) {
         modal.style.display = 'flex';
-        document.getElementById('addTestForm').reset();
+        modal.classList.add('active');
+        const form = document.getElementById('addTestForm');
+        if (form) form.reset();
     }
 }
+window.openAddTestForm = openAddTestForm;
 
 function closeAddTestModal() {
     const modal = document.getElementById('addTestModal');
     if (modal) {
         modal.style.display = 'none';
+        modal.classList.remove('active');
     }
 }
+window.closeAddTestModal = closeAddTestModal;
 
 function saveNewTest() {
     const name = document.getElementById('testName').value.trim();
@@ -1259,17 +1273,9 @@ function saveNewTest() {
     closeAddTestModal();
     showNotification(`${name} test added successfully!`, 'success');
 }
-
-// Expose modal functions globally
-window.openAddSupplyForm = openAddSupplyForm;
-window.closeAddSupplyModal = closeAddSupplyModal;
-window.saveNewSupply = saveNewSupply;
-window.openAddVolunteerForm = openAddVolunteerForm;
-window.closeAddVolunteerModal = closeAddVolunteerModal;
-window.saveNewVolunteer = saveNewVolunteer;
-window.openAddTestForm = openAddTestForm;
-window.closeAddTestModal = closeAddTestModal;
 window.saveNewTest = saveNewTest;
+
+// All modal functions are now exported immediately after their definitions above
 
 // View test information
 function viewTestInfo(testType) {
