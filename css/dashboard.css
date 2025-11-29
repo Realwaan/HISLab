@@ -2741,15 +2741,27 @@ body {
 #newAppointmentModal .modal-content {
     max-width: 580px;
     background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
     overflow: hidden;
+    animation: appointmentModalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes appointmentModalIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(-30px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 #newAppointmentModal .modal-header {
     background: linear-gradient(135deg, #00695C 0%, #00897B 100%);
     color: white;
-    padding: 24px 30px;
+    padding: 28px 32px;
     border-bottom: none;
     position: relative;
     overflow: hidden;
@@ -2758,12 +2770,30 @@ body {
 #newAppointmentModal .modal-header::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -50px;
+    top: -80%;
+    right: -60px;
     width: 200px;
     height: 200px;
-    background: rgba(255, 255, 255, 0.1);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
     border-radius: 50%;
+    animation: floatGently 8s ease-in-out infinite;
+}
+
+#newAppointmentModal .modal-header::after {
+    content: '';
+    position: absolute;
+    bottom: -60%;
+    left: -40px;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: floatGently 6s ease-in-out infinite reverse;
+}
+
+@keyframes floatGently {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
 }
 
 #newAppointmentModal .modal-header {
@@ -2778,62 +2808,132 @@ body {
     font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     position: relative;
     z-index: 1;
+    animation: slideInFromLeft 0.5s ease-out 0.1s both;
+}
+
+@keyframes slideInFromLeft {
+    0% {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 #newAppointmentModal .modal-header h2 i {
     font-size: 28px;
     color: #81C784;
+    animation: iconPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+}
+
+@keyframes iconPop {
+    0% {
+        opacity: 0;
+        transform: scale(0) rotate(-180deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
 }
 
 #newAppointmentModal .btn-close {
     background: rgba(255, 255, 255, 0.2);
     color: white;
     border: none;
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     font-size: 24px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
     z-index: 1;
     flex-shrink: 0;
+    backdrop-filter: blur(4px);
 }
 
 #newAppointmentModal .btn-close:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: rotate(90deg);
+    background: rgba(255, 255, 255, 0.35);
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 #newAppointmentModal .modal-body {
-    padding: 30px;
+    padding: 32px;
+    animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 #newAppointmentModal .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 22px;
     position: relative;
+    animation: formFieldSlide 0.4s ease-out both;
+}
+
+#newAppointmentModal .form-group:nth-child(1) { animation-delay: 0.25s; }
+#newAppointmentModal .form-group:nth-child(2) { animation-delay: 0.30s; }
+#newAppointmentModal .form-group:nth-child(3) { animation-delay: 0.35s; }
+#newAppointmentModal .form-group:nth-child(4) { animation-delay: 0.40s; }
+#newAppointmentModal .form-group:nth-child(5) { animation-delay: 0.45s; }
+
+#newAppointmentModal .form-row {
+    animation: formFieldSlide 0.4s ease-out 0.30s both;
+}
+
+@keyframes formFieldSlide {
+    0% {
+        opacity: 0;
+        transform: translateX(-15px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 #newAppointmentModal .form-group label {
     display: flex;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     color: #00695C;
     font-size: 14px;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    transition: color 0.3s ease;
+}
+
+#newAppointmentModal .form-group:focus-within label {
+    color: #00897B;
 }
 
 #newAppointmentModal .form-group label::before {
     content: '❖';
     color: #00897B;
     font-size: 10px;
+    transition: transform 0.3s ease;
+}
+
+#newAppointmentModal .form-group:focus-within label::before {
+    transform: rotate(45deg) scale(1.2);
 }
 
 #newAppointmentModal .form-group label i {
@@ -2849,7 +2949,7 @@ body {
     border-radius: 12px;
     font-size: 14px;
     font-family: 'Segoe UI', Arial, sans-serif;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background: white;
     box-sizing: border-box;
 }
@@ -2859,15 +2959,16 @@ body {
 #newAppointmentModal .form-group textarea:focus {
     outline: none;
     border-color: #00897B;
-    box-shadow: 0 0 0 4px rgba(0, 137, 123, 0.1);
-    background: #F1F8F7;
+    box-shadow: 0 0 0 4px rgba(0, 137, 123, 0.15), 0 4px 12px rgba(0, 137, 123, 0.1);
+    background: #F8FFFE;
+    transform: translateY(-2px);
 }
 
 #newAppointmentModal .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 20px;
+    gap: 18px;
+    margin-bottom: 22px;
 }
 
 #newAppointmentModal .form-group input[type="date"],
@@ -2889,26 +2990,29 @@ body {
 }
 
 #newAppointmentModal .modal-footer {
-    background: transparent;
-    padding: 20px 30px;
+    background: linear-gradient(to top, #f8f9fa 0%, transparent 100%);
+    padding: 24px 32px;
     border-top: none;
     display: flex;
     justify-content: center;
-    gap: 12px;
+    gap: 14px;
+    animation: fadeInUp 0.5s ease-out 0.5s both;
 }
 
 #newAppointmentModal .btn {
-    padding: 12px 24px;
+    padding: 14px 28px;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
 #newAppointmentModal .btn-secondary {
@@ -2919,8 +3023,9 @@ body {
 
 #newAppointmentModal .btn-secondary:hover {
     background: #F5F5F5;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    border-color: #BDBDBD;
 }
 
 #newAppointmentModal .btn-primary {
@@ -2938,19 +3043,23 @@ body {
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.3);
     transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
+    transition: width 0.5s ease, height 0.5s ease;
 }
 
 #newAppointmentModal .btn-primary:hover::before {
-    width: 300px;
-    height: 300px;
+    width: 350px;
+    height: 350px;
 }
 
 #newAppointmentModal .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 137, 123, 0.4);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 137, 123, 0.45);
+}
+
+#newAppointmentModal .btn-primary:active {
+    transform: translateY(-1px) scale(0.98);
 }
 
 #newAppointmentModal .btn-primary i,
@@ -3041,20 +3150,38 @@ body {
 #newAppointmentModal .info-badge {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
+    gap: 10px;
+    padding: 14px 18px;
     background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
     border-left: 4px solid #66BB6A;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 13px;
     color: #2E7D32;
-    margin-top: 16px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-top: 18px;
+    box-shadow: 0 3px 8px rgba(102, 187, 106, 0.15);
+    animation: infoBadgeSlide 0.5s ease-out 0.55s both;
+}
+
+@keyframes infoBadgeSlide {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 #newAppointmentModal .info-badge i {
-    font-size: 16px;
+    font-size: 18px;
     color: #43A047;
+    animation: pulseIcon 2s ease-in-out infinite;
+}
+
+@keyframes pulseIcon {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
 }
 
 /* Enhanced input styling */
