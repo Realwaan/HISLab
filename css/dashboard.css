@@ -1779,6 +1779,15 @@ body {
     animation: modalSlideIn 0.15s ease-out forwards;
 }
 
+/* General modal closing animation */
+.modal.closing {
+    animation: modalBgFadeOut 0.3s ease-out forwards;
+}
+
+.modal .modal-content.closing {
+    animation: modalSlideOut 0.3s ease-in forwards !important;
+}
+
 .modal-overlay {
     position: absolute;
     top: 0;
@@ -2747,6 +2756,14 @@ body {
     animation: appointmentModalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
+#newAppointmentModal .modal-content.closing {
+    animation: appointmentModalOut 0.3s ease-in forwards;
+}
+
+#newAppointmentModal.closing {
+    animation: modalBgFadeOut 0.3s ease-out forwards;
+}
+
 @keyframes appointmentModalIn {
     0% {
         opacity: 0;
@@ -2755,6 +2772,26 @@ body {
     100% {
         opacity: 1;
         transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes appointmentModalOut {
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+}
+
+@keyframes modalBgFadeOut {
+    0% {
+        background: rgba(0, 0, 0, 0.5);
+    }
+    100% {
+        background: rgba(0, 0, 0, 0);
     }
 }
 

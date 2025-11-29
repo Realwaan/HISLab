@@ -1099,16 +1099,38 @@ function openModal(modalId) {
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.classList.add('closing');
+        }
+        modal.classList.add('closing');
         modal.classList.remove('show');
-        setTimeout(() => modal.style.display = 'none', 300);
+        setTimeout(() => {
+            modal.style.display = 'none';
+            modal.classList.remove('closing');
+            if (modalContent) {
+                modalContent.classList.remove('closing');
+            }
+        }, 300);
     }
 }
 
 // Close modal when clicking outside
 window.addEventListener('click', function(event) {
     if (event.target.classList.contains('modal')) {
+        const modalContent = event.target.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.classList.add('closing');
+        }
+        event.target.classList.add('closing');
         event.target.classList.remove('show');
-        setTimeout(() => event.target.style.display = 'none', 300);
+        setTimeout(() => {
+            event.target.style.display = 'none';
+            event.target.classList.remove('closing');
+            if (modalContent) {
+                modalContent.classList.remove('closing');
+            }
+        }, 300);
     }
 });
 
