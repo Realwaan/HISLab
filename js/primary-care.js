@@ -752,58 +752,89 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// Open add supply form
+// ============================================
+// ADD SUPPLY MODAL FUNCTIONS
+// ============================================
+
 function openAddSupplyForm() {
-    console.log('Opening add supply form');
+    const modal = document.getElementById('addSupplyModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.getElementById('addSupplyForm').reset();
+    }
+}
+
+function closeAddSupplyModal() {
+    const modal = document.getElementById('addSupplyModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function saveNewSupply() {
+    const name = document.getElementById('supplyName').value.trim();
+    const category = document.getElementById('supplyCategory').value;
+    const quantity = parseInt(document.getElementById('supplyQuantity').value) || 0;
+    const reorderLevel = parseInt(document.getElementById('supplyReorderLevel').value) || 0;
     
-    const supplyName = prompt('Enter supply name:');
-    if (!supplyName) return;
-    
-    const quantity = prompt('Enter initial quantity:', '100');
-    if (!quantity) return;
-    
-    const reorderLevel = prompt('Enter reorder level:', '50');
-    if (!reorderLevel) return;
-    
-    const category = prompt('Enter category (Medication/Antibiotics/Equipment/Supplies):', 'Medication');
-    if (!category) return;
+    if (!name || !category) {
+        alert('Please fill in all required fields');
+        return;
+    }
     
     const newSupply = {
         id: supplies.length + 1,
-        name: supplyName,
-        quantity: parseInt(quantity),
-        reorderLevel: parseInt(reorderLevel),
+        name: name,
+        quantity: quantity,
+        reorderLevel: reorderLevel,
         category: category,
-        status: 'adequate'
+        status: quantity > reorderLevel ? 'adequate' : (quantity > 0 ? 'low' : 'critical')
     };
     
     supplies.push(newSupply);
     localStorage.setItem('clinikabayan_supplies', JSON.stringify(supplies));
     renderSupplies();
-    showNotification(`${supplyName} added successfully!`, 'success');
+    closeAddSupplyModal();
+    showNotification(`${name} added successfully!`, 'success');
 }
 
-// Open add volunteer form
+// ============================================
+// ADD VOLUNTEER MODAL FUNCTIONS
+// ============================================
+
 function openAddVolunteerForm() {
-    console.log('Opening add volunteer form');
+    const modal = document.getElementById('addVolunteerModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.getElementById('addVolunteerForm').reset();
+    }
+}
+
+function closeAddVolunteerModal() {
+    const modal = document.getElementById('addVolunteerModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function saveNewVolunteer() {
+    const name = document.getElementById('volunteerName').value.trim();
+    const role = document.getElementById('volunteerRole').value;
+    const license = document.getElementById('volunteerLicense').value.trim();
+    const phone = document.getElementById('volunteerPhone').value.trim();
+    const schedule = document.getElementById('volunteerSchedule').value.trim();
     
-    const name = prompt('Enter volunteer full name:');
-    if (!name) return;
-    
-    const role = prompt('Enter role (e.g., General Physician, Nurse, Midwife):', 'General Physician');
-    if (!role) return;
-    
-    const license = prompt('Enter license number:');
-    if (!license) return;
-    
-    const schedule = prompt('Enter availability schedule (e.g., Mon, Wed, Fri):', 'Mon, Wed');
-    if (!schedule) return;
+    if (!name || !role || !license || !schedule) {
+        alert('Please fill in all required fields');
+        return;
+    }
     
     const newVolunteer = {
         id: volunteers.length + 1,
         name: name,
         role: role,
         license: license,
+        phone: phone,
         status: 'available',
         schedule: schedule
     };
@@ -811,14 +842,78 @@ function openAddVolunteerForm() {
     volunteers.push(newVolunteer);
     localStorage.setItem('clinikabayan_volunteers', JSON.stringify(volunteers));
     renderVolunteers();
+    closeAddVolunteerModal();
     showNotification(`${name} added successfully!`, 'success');
 }
 
-// Open add test form
+// ============================================
+// ADD TEST MODAL FUNCTIONS
+// ============================================
+
 function openAddTestForm() {
-    console.log('Opening add test form');
-    alert('Add Medical Test\n\nThis feature allows adding new diagnostic tests.\n\nIn the full application, this would open a form to add:\n- Test Name\n- Description\n- Duration\n- Cost\n- Interpretation Guidelines\n- Normal ranges\n- Required equipment');
+    const modal = document.getElementById('addTestModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.getElementById('addTestForm').reset();
+    }
 }
+
+function closeAddTestModal() {
+    const modal = document.getElementById('addTestModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function saveNewTest() {
+    const name = document.getElementById('testName').value.trim();
+    const category = document.getElementById('testCategory').value;
+    const description = document.getElementById('testDescription').value.trim();
+    const duration = parseInt(document.getElementById('testDuration').value) || 15;
+    const cost = parseInt(document.getElementById('testCost').value) || 0;
+    const normalRange = document.getElementById('testNormalRange').value.trim();
+    
+    if (!name || !category) {
+        alert('Please fill in all required fields');
+        return;
+    }
+    
+    // Add to tests display (you could store in localStorage if needed)
+    const testsGrid = document.querySelector('#tab-tests .tests-grid');
+    if (testsGrid) {
+        const testCard = document.createElement('div');
+        testCard.className = 'test-card';
+        testCard.innerHTML = `
+            <div class="test-icon" style="background: linear-gradient(135deg, #FF5722, #E64A19);">
+                <i class="fas fa-flask"></i>
+            </div>
+            <div class="test-info">
+                <h4>${name}</h4>
+                <p>${description || category}</p>
+                <span class="test-duration"><i class="fas fa-clock"></i> ${duration} mins</span>
+                ${cost > 0 ? `<span class="test-cost"><i class="fas fa-peso-sign"></i> ₱${cost}</span>` : '<span class="test-cost free">Free</span>'}
+            </div>
+            <button class="btn-info" onclick="alert('Test: ${name}\\nCategory: ${category}\\nDuration: ${duration} mins\\nCost: ${cost > 0 ? '₱' + cost : 'Free'}\\nNormal Range: ${normalRange || 'N/A'}')">
+                <i class="fas fa-info-circle"></i>
+            </button>
+        `;
+        testsGrid.appendChild(testCard);
+    }
+    
+    closeAddTestModal();
+    showNotification(`${name} test added successfully!`, 'success');
+}
+
+// Expose modal functions globally
+window.openAddSupplyForm = openAddSupplyForm;
+window.closeAddSupplyModal = closeAddSupplyModal;
+window.saveNewSupply = saveNewSupply;
+window.openAddVolunteerForm = openAddVolunteerForm;
+window.closeAddVolunteerModal = closeAddVolunteerModal;
+window.saveNewVolunteer = saveNewVolunteer;
+window.openAddTestForm = openAddTestForm;
+window.closeAddTestModal = closeAddTestModal;
+window.saveNewTest = saveNewTest;
 
 // View test information
 function viewTestInfo(testType) {

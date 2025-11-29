@@ -724,7 +724,7 @@ function createModals() {
                 <form id="appointmentForm" onsubmit="saveAppointment(event)">
                     <div class="modal-body">
                         <div class="form-group">
-                            <label><i class="fas fa-user"></i> Patient Name</label>
+                            <label>Patient Name <span class="required">*</span></label>
                             <input type="text" name="patient" required list="patientList" placeholder="Select or type patient name">
                             <datalist id="patientList">
                                 ${dashboardData.patients.map(p => `<option value="${p.firstName} ${p.lastName}">`).join('')}
@@ -732,16 +732,16 @@ function createModals() {
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label><i class="fas fa-calendar"></i> Date</label>
+                                <label>Date <span class="required">*</span></label>
                                 <input type="date" name="date" required min="${new Date().toISOString().split('T')[0]}">
                             </div>
                             <div class="form-group">
-                                <label><i class="fas fa-clock"></i> Time</label>
+                                <label>Time <span class="required">*</span></label>
                                 <input type="time" name="time" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label><i class="fas fa-stethoscope"></i> Appointment Type</label>
+                            <label>Appointment Type <span class="required">*</span></label>
                             <select name="type" required>
                                 <option value="">Select appointment type...</option>
                                 <option value="General Checkup">🩺 General Checkup</option>
@@ -754,7 +754,7 @@ function createModals() {
                             </select>
                         </div>
                         <div class="form-group">
-                            <label><i class="fas fa-notes-medical"></i> Additional Notes</label>
+                            <label>Additional Notes <span class="required">*</span></label>
                             <textarea name="notes" rows="3" placeholder="Enter any special instructions, symptoms, or additional information..."></textarea>
                         </div>
                         <div class="info-badge">
@@ -980,12 +980,12 @@ function createModals() {
                 <form id="taskForm" onsubmit="saveTask(event)">
                     <div class="modal-body">
                         <div class="form-group">
-                            <label><i class="fas fa-tasks"></i> Task Description</label>
+                            <label>Task Description <span class="required">*</span></label>
                             <input type="text" name="title" required placeholder="Enter task description...">
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label><i class="fas fa-flag"></i> Priority Level</label>
+                                <label>Priority Level <span class="required">*</span></label>
                                 <select name="priority" required>
                                     <option value="high">🔴 High Priority</option>
                                     <option value="medium" selected>🟡 Medium Priority</option>
@@ -993,7 +993,7 @@ function createModals() {
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label><i class="fas fa-calendar-day"></i> Due Date</label>
+                                <label>Due Date <span class="required">*</span></label>
                                 <input type="date" name="dueDate" required>
                             </div>
                         </div>
@@ -1417,5 +1417,22 @@ window.switchPatientTab = switchPatientTab;
 window.editPatientInfo = editPatientInfo;
 window.renderPatientsList = renderPatientsList;
 window.filterPatientsList = filterPatientsList;
+
+// Additional modal functions
+window.closePendingRequests = closePendingRequests;
+window.selectRequest = selectRequest;
+window.processPendingRequest = processPendingRequest;
+window.closeLabRequest = closeLabRequest;
+window.addLabTest = addLabTest;
+window.removeLabTest = removeLabTest;
+
+// Lab Request action functions
+window.saveLabRequestLater = saveLabRequestLater;
+window.itemNotAvailable = itemNotAvailable;
+window.requestPayment = requestPayment;
+window.revokeTag = revokeTag;
+window.proceedToTransactions = proceedToTransactions;
+window.printLabRequest = printLabRequest;
+window.openLabRequest = openLabRequest;
 
 console.log('Dashboard functions exposed globally');

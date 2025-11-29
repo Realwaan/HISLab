@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Tabs</title>
+    <style>
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .transport-tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: #e0e0e0;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .transport-tab-btn.active {
+            background: #2196F3;
+            color: white;
+        }
+        .transport-tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .transport-tab-content.active {
+            display: block;
+        }
+    </style>
+    <script>
+    function switchTransportTab(tabName) {
+        console.log('Switching to:', tabName);
+        
+        // Remove active from all buttons
+        var buttons = document.querySelectorAll('.transport-tab-btn');
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].classList.remove('active');
+        }
+        
+        // Remove active from all tab contents  
+        var contents = document.querySelectorAll('.transport-tab-content');
+        for (var j = 0; j < contents.length; j++) {
+            contents[j].classList.remove('active');
+        }
+        
+        // Activate clicked button
+        for (var k = 0; k < buttons.length; k++) {
+            var onclick = buttons[k].getAttribute('onclick') || '';
+            if (onclick.indexOf(tabName) !== -1) {
+                buttons[k].classList.add('active');
+            }
+        }
+        
+        // Show tab content
+        var tabContent = document.getElementById(tabName + '-tab');
+        console.log('Looking for:', tabName + '-tab', tabContent);
+        if (tabContent) {
+            tabContent.classList.add('active');
+            console.log('Activated!');
+        }
+    }
+    </script>
+</head>
+<body>
+    <h1>Tab Test</h1>
+    
+    <div class="tabs-container">
+        <button class="transport-tab-btn active" onclick="switchTransportTab('requests')">
+            Active Requests
+        </button>
+        <button class="transport-tab-btn" onclick="switchTransportTab('referrals')">
+            Referrals
+        </button>
+        <button class="transport-tab-btn" onclick="switchTransportTab('vehicles')">
+            Vehicles & Drivers
+        </button>
+        <button class="transport-tab-btn" onclick="switchTransportTab('history')">
+            History
+        </button>
+    </div>
+
+    <div class="transport-tab-contents">
+        <div class="transport-tab-content active" id="requests-tab">
+            <h2>Active Requests Content</h2>
+            <p>This is the requests tab content.</p>
+        </div>
+        <div class="transport-tab-content" id="referrals-tab">
+            <h2>Referrals Content</h2>
+            <p>This is the referrals tab content.</p>
+        </div>
+        <div class="transport-tab-content" id="vehicles-tab">
+            <h2>Vehicles & Drivers Content</h2>
+            <p>This is the vehicles tab content.</p>
+        </div>
+        <div class="transport-tab-content" id="history-tab">
+            <h2>History Content</h2>
+            <p>This is the history tab content.</p>
+        </div>
+    </div>
+</body>
+</html>

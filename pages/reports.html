@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Clinikabayan HIS</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-small">
+                <img src="../assets/logo.png" alt="Clinikabayan Logo" class="logo-image-small">
+            </div>
+            <h3>Clinikabayan</h3>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="primary-care.html" class="nav-item">
+                <i class="fas fa-heartbeat"></i>
+                <span>Primary Care</span>
+            </a>
+            <a href="transport-referral.html" class="nav-item">
+                <i class="fas fa-ambulance"></i>
+                <span>Transport & Referral</span>
+            </a>
+            <a href="health-campaigns.html" class="nav-item">
+                <i class="fas fa-bullhorn"></i>
+                <span>Health Campaigns</span>
+            </a>
+            <a href="reports.html" class="nav-item active">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <p class="user-name" id="userName">Admin User</p>
+                    <p class="user-role">Administrator</p>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="btn-menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Reports & Analytics</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="btn btn-primary" onclick="alert('Generate Report feature coming soon!')">
+                    <i class="fas fa-file-export"></i> Generate Report
+                </button>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            <!-- Stats Overview -->
+            <div class="stats-grid" style="margin-bottom: 30px;">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #4CAF50, #2E7D32);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4>1,247</h4>
+                        <p>Total Patients</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #2196F3, #1565C0);">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4>3,892</h4>
+                        <p>Total Appointments</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #FF9800, #EF6C00);">
+                        <i class="fas fa-ambulance"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4>456</h4>
+                        <p>Transport Requests</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #9C27B0, #6A1B9A);">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4>24</h4>
+                        <p>Campaigns</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Categories -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #4CAF50, #2E7D32); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user-injured" style="color: white; font-size: 20px;"></i>
+                        </div>
+                        <h3 style="margin: 0; color: #333;">Patient Reports</h3>
+                    </div>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="padding: 12px 0; border-bottom: 1px solid #eee; cursor: pointer;" onclick="alert('Patient Demographics Report')">
+                            <i class="fas fa-chart-pie" style="color: #4CAF50; margin-right: 10px;"></i> Demographics Report
+                        </li>
+                        <li style="padding: 12px 0; border-bottom: 1px solid #eee; cursor: pointer;" onclick="alert('Medical Records Summary')">
+                            <i class="fas fa-file-medical" style="color: #4CAF50; margin-right: 10px;"></i> Medical Records Summary
+                        </li>
+                        <li style="padding: 12px 0; cursor: pointer;" onclick="alert('Treatment History')">
+                            <i class="fas fa-history" style="color: #4CAF50; margin-right: 10px;"></i> Treatment History
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #2196F3, #1565C0); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-calendar-alt" style="color: white; font-size: 20px;"></i>
+                        </div>
+                        <h3 style="margin: 0; color: #333;">Appointment Reports</h3>
+                    </div>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="padding: 12px 0; border-bottom: 1px solid #eee; cursor: pointer;" onclick="alert('Daily Appointments')">
+                            <i class="fas fa-calendar-day" style="color: #2196F3; margin-right: 10px;"></i> Daily Summary
+                        </li>
+                        <li style="padding: 12px 0; border-bottom: 1px solid #eee; cursor: pointer;" onclick="alert('Weekly Appointments')">
+                            <i class="fas fa-calendar-week" style="color: #2196F3; margin-right: 10px;"></i> Weekly Summary
+                        </li>
+                        <li style="padding: 12px 0; cursor: pointer;" onclick="alert('Monthly Appointments')">
+                            <i class="fas fa-calendar" style="color: #2196F3; margin-right: 10px;"></i> Monthly Summary
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #FF9800, #EF6C00); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-ambulance" style="color: white; font-size: 20px;"></i>
+                        </div>
+                        <h3 style="margin: 0; color: #333;">Transport Reports</h3>
+                    </div>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="padding: 12px 0; border-bottom: 1px solid #eee; cursor: pointer;" onclick="alert('Transport Requests Report')">
+                            <i class="fas fa-truck" style="color: #FF9800; margin-right: 10px;"></i> Request Summary
+                        </li>
+                        <li style="padding: 12px 0; border-bottom: 1px solid #eee; cursor: pointer;" onclick="alert('Vehicle Usage Report')">
+                            <i class="fas fa-car" style="color: #FF9800; margin-right: 10px;"></i> Vehicle Usage
+                        </li>
+                        <li style="padding: 12px 0; cursor: pointer;" onclick="alert('Referral Statistics')">
+                            <i class="fas fa-exchange-alt" style="color: #FF9800; margin-right: 10px;"></i> Referral Statistics
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #9C27B0, #6A1B9A); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-bullhorn" style="color: white; font-size: 20px;"></i>
+                        </div>
+                        <h3 style="margin: 0; color: #333;">Campaign Reports</h3>
+                    </div>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="padding: 12px 0; border-bottom: 1px solid #eee; cursor: pointer;" onclick="alert('Campaign Performance')">
+                            <i class="fas fa-chart-line" style="color: #9C27B0; margin-right: 10px;"></i> Performance Metrics
+                        </li>
+                        <li style="padding: 12px 0; border-bottom: 1px solid #eee; cursor: pointer;" onclick="alert('Participant Report')">
+                            <i class="fas fa-users" style="color: #9C27B0; margin-right: 10px;"></i> Participant Report
+                        </li>
+                        <li style="padding: 12px 0; cursor: pointer;" onclick="alert('Resource Utilization')">
+                            <i class="fas fa-boxes" style="color: #9C27B0; margin-right: 10px;"></i> Resource Utilization
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

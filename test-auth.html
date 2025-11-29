@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Set Auth for Testing</title>
+</head>
+<body>
+    <h1>Auth Set!</h1>
+    <p>Click buttons below to navigate:</p>
+    <button onclick="window.location.href='pages/dashboard.html'">Dashboard</button>
+    <button onclick="window.location.href='pages/primary-care.html'">Primary Care</button>
+    <button onclick="window.location.href='pages/transport-referral.html'">Transport & Referral</button>
+    <button onclick="window.location.href='pages/health-campaigns.html'">Health Campaigns</button>
+    <script>
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userData', JSON.stringify({
+            fullname: 'Test Admin',
+            email: 'admin@test.com',
+            role: 'Administrator'
+        }));
+        console.log('Auth set!');
+    </script>
+</body>
+</html>

@@ -84,19 +84,19 @@
         <div class="dashboard-container">
             <!-- Tabs Navigation -->
             <div class="tabs-container">
-                <button class="tab-btn active" data-tab="overview">
+                <button class="tab-btn active" onclick="document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('overviewTab').classList.add('active');">
                     <i class="fas fa-chart-line"></i> Overview
                 </button>
-                <button class="tab-btn" data-tab="upcoming">
+                <button class="tab-btn" onclick="document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('upcomingTab').classList.add('active');">
                     <i class="fas fa-calendar-alt"></i> Upcoming
                 </button>
-                <button class="tab-btn" data-tab="active">
+                <button class="tab-btn" onclick="document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('activeTab').classList.add('active');">
                     <i class="fas fa-bullhorn"></i> Active
                 </button>
-                <button class="tab-btn" data-tab="completed">
+                <button class="tab-btn" onclick="document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('completedTab').classList.add('active');">
                     <i class="fas fa-check-double"></i> Completed
                 </button>
-                <button class="tab-btn" data-tab="resources">
+                <button class="tab-btn" onclick="document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('resourcesTab').classList.add('active');">
                     <i class="fas fa-warehouse"></i> Resources
                 </button>
             </div>

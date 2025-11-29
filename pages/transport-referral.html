@@ -125,16 +125,16 @@
             <div class="transport-tabs-wrapper">
                 <!-- Tabs Navigation -->
                 <div class="tabs-container">
-                    <button class="transport-tab-btn active" onclick="switchTransportTab('requests')">
+                    <button class="transport-tab-btn active" onclick="document.querySelectorAll('.transport-tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.transport-tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('requests-tab').classList.add('active');">
                         <i class="fas fa-ambulance"></i> Active Requests
                     </button>
-                    <button class="transport-tab-btn" onclick="switchTransportTab('referrals')">
+                    <button class="transport-tab-btn" onclick="document.querySelectorAll('.transport-tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.transport-tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('referrals-tab').classList.add('active');">
                         <i class="fas fa-file-medical-alt"></i> Referrals
                     </button>
-                    <button class="transport-tab-btn" onclick="switchTransportTab('vehicles')">
+                    <button class="transport-tab-btn" onclick="document.querySelectorAll('.transport-tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.transport-tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('vehicles-tab').classList.add('active');">
                         <i class="fas fa-truck-medical"></i> Vehicles & Drivers
                     </button>
-                    <button class="transport-tab-btn" onclick="switchTransportTab('history')">
+                    <button class="transport-tab-btn" onclick="document.querySelectorAll('.transport-tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.transport-tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('history-tab').classList.add('active');">
                         <i class="fas fa-clock"></i> History
                     </button>
                 </div>

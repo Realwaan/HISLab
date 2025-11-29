@@ -232,3 +232,14 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Export functions for use in HTML onclick handlers
+window.logout = logout;
+window.editCampaign = editCampaign;
+window.viewCampaign = viewCampaign;
+window.manageCampaign = manageCampaign;
+window.viewReport = viewReport;
+window.downloadReport = downloadReport;
+window.addResource = addResource;
+window.editResource = editResource;
+window.showNotification = showNotification;

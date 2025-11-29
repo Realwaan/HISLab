@@ -8,6 +8,35 @@
     <link rel="stylesheet" href="../css/dashboard.css">
     <link rel="stylesheet" href="../css/primary-care.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Custom scrollbar for modals */
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            border-radius: 4px;
+        }
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #388E3C, #1B5E20);
+        }
+        #addVolunteerModal .modal-body::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #9C27B0, #6A1B9A);
+        }
+        #addVolunteerModal .modal-body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #7B1FA2, #4A148C);
+        }
+        #addTestModal .modal-body::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #FF5722, #D84315);
+        }
+        #addTestModal .modal-body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #E64A19, #BF360C);
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar -->
@@ -74,7 +103,7 @@
                 <h1 class="page-title">Primary Care Services</h1>
             </div>
             <div class="topbar-right">
-                <button class="btn btn-primary" id="btnNewPatient">
+                <button class="btn btn-primary" id="btnNewPatient" onclick="document.getElementById('newPatientModal').style.display='flex';">
                     <i class="fas fa-user-plus"></i> New Patient
                 </button>
             </div>
@@ -84,19 +113,19 @@
         <div class="dashboard-container">
             <!-- Tabs Navigation -->
             <div class="tabs-container">
-                <button class="tab-btn active" data-tab="admission">
+                <button class="tab-btn active" onclick="document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('tab-admission').classList.add('active');">
                     <i class="fas fa-notes-medical"></i> Admission Dashboard
                 </button>
-                <button class="tab-btn" data-tab="demographics">
+                <button class="tab-btn" onclick="document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('tab-demographics').classList.add('active');">
                     <i class="fas fa-chart-pie"></i> Demographics
                 </button>
-                <button class="tab-btn" data-tab="inventory">
+                <button class="tab-btn" onclick="document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('tab-inventory').classList.add('active');">
                     <i class="fas fa-pills"></i> Inventory
                 </button>
-                <button class="tab-btn" data-tab="volunteers">
+                <button class="tab-btn" onclick="document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('tab-volunteers').classList.add('active');">
                     <i class="fas fa-user-friends"></i> Volunteers
                 </button>
-                <button class="tab-btn" data-tab="tests">
+                <button class="tab-btn" onclick="document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('tab-tests').classList.add('active');">
                     <i class="fas fa-microscope"></i> Available Tests
                 </button>
             </div>
@@ -315,7 +344,7 @@
             <div class="tab-content" id="tab-inventory">
                 <div class="content-header">
                     <h2>Medical Supplies Inventory</h2>
-                    <button class="btn btn-primary" id="btnAddSupply">
+                    <button class="btn btn-primary" id="btnAddSupply" onclick="document.getElementById('addSupplyModal').style.display='flex';">
                         <i class="fas fa-plus"></i> Add Supply
                     </button>
                 </div>
@@ -415,7 +444,7 @@
             <div class="tab-content" id="tab-volunteers">
                 <div class="content-header">
                     <h2>Medical Volunteers</h2>
-                    <button class="btn btn-primary" id="btnAddVolunteer">
+                    <button class="btn btn-primary" id="btnAddVolunteer" onclick="document.getElementById('addVolunteerModal').style.display='flex';">
                         <i class="fas fa-user-plus"></i> Add Volunteer
                     </button>
                 </div>
@@ -500,7 +529,7 @@
             <div class="tab-content" id="tab-tests">
                 <div class="content-header">
                     <h2>Available Medical Tests</h2>
-                    <button class="btn btn-primary" id="btnAddTest">
+                    <button class="btn btn-primary" id="btnAddTest" onclick="document.getElementById('addTestModal').style.display='flex';">
                         <i class="fas fa-plus"></i> Add Test
                     </button>
                 </div>
@@ -1049,6 +1078,229 @@
                 </button>
                 <button type="button" class="btn btn-primary" onclick="saveMedicalRecord()">
                     <i class="fas fa-check"></i> Save Medical Record
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Supply Modal -->
+    <div id="addSupplyModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeAddSupplyModal()"></div>
+        <div class="modal-content" style="max-width: 520px; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.25);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%); padding: 24px 28px; position: relative;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-pills" style="font-size: 22px; color: white;"></i>
+                    </div>
+                    <div>
+                        <h2 style="margin: 0; color: white; font-size: 20px; font-weight: 600;">Add New Supply</h2>
+                        <p style="margin: 4px 0 0 0; color: rgba(255,255,255,0.8); font-size: 13px;">Medical Inventory Management</p>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeAddSupplyModal()" style="position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">×</button>
+            </div>
+            <div class="modal-body" style="padding: 28px; background: #f8faf8; max-height: 60vh; overflow-y: auto;">
+                <form id="addSupplyForm">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #2E7D32; margin-bottom: 8px; font-size: 14px;">
+                            <i class="fas fa-box"></i> Supply Name <span style="color: #e53935;">*</span>
+                        </label>
+                        <input type="text" id="supplyName" name="supplyName" required placeholder="e.g., Paracetamol 500mg" style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; transition: all 0.3s; box-sizing: border-box;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #2E7D32; margin-bottom: 8px; font-size: 14px;">
+                            <i class="fas fa-layer-group"></i> Category <span style="color: #e53935;">*</span>
+                        </label>
+                        <select id="supplyCategory" name="supplyCategory" required style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; background: white; cursor: pointer; box-sizing: border-box;">
+                            <option value="">Select Category</option>
+                            <option value="Medication">💊 Medication</option>
+                            <option value="Antibiotics">💉 Antibiotics</option>
+                            <option value="Equipment">🔧 Equipment</option>
+                            <option value="Supplies">📦 Supplies</option>
+                            <option value="Vaccines">🧬 Vaccines</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #2E7D32; margin-bottom: 8px; font-size: 14px;">
+                                <i class="fas fa-cubes"></i> Quantity <span style="color: #e53935;">*</span>
+                            </label>
+                            <input type="number" id="supplyQuantity" name="supplyQuantity" required min="0" value="100" style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #2E7D32; margin-bottom: 8px; font-size: 14px;">
+                                <i class="fas fa-exclamation-triangle"></i> Reorder Level <span style="color: #e53935;">*</span>
+                            </label>
+                            <input type="number" id="supplyReorderLevel" name="supplyReorderLevel" required min="0" value="50" style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #2E7D32; margin-bottom: 8px; font-size: 14px;">
+                            <i class="fas fa-sticky-note"></i> Notes (Optional)
+                        </label>
+                        <textarea id="supplyNotes" name="supplyNotes" rows="2" placeholder="Additional notes about this supply..." style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; resize: none; box-sizing: border-box;"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 12px; padding: 20px 28px; background: white; border-top: 1px solid #e8e8e8;">
+                <button type="button" onclick="closeAddSupplyModal()" style="padding: 12px 28px; border: 2px solid #e0e0e0; border-radius: 10px; background: white; color: #666; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" onclick="saveNewSupply()" style="padding: 12px 28px; border: none; border-radius: 10px; background: linear-gradient(135deg, #4CAF50, #2E7D32); color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(76,175,80,0.3); transition: all 0.3s;">
+                    <i class="fas fa-plus"></i> Add Supply
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Volunteer Modal -->
+    <div id="addVolunteerModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeAddVolunteerModal()"></div>
+        <div class="modal-content" style="max-width: 560px; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.25);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #9C27B0 0%, #6A1B9A 100%); padding: 24px 28px; position: relative;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user-md" style="font-size: 22px; color: white;"></i>
+                    </div>
+                    <div>
+                        <h2 style="margin: 0; color: white; font-size: 20px; font-weight: 600;">Add New Volunteer</h2>
+                        <p style="margin: 4px 0 0 0; color: rgba(255,255,255,0.8); font-size: 13px;">Healthcare Professional Registration</p>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeAddVolunteerModal()" style="position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">×</button>
+            </div>
+            <div class="modal-body" style="padding: 28px; background: #faf8fb; max-height: 60vh; overflow-y: auto;">
+                <form id="addVolunteerForm">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #6A1B9A; margin-bottom: 8px; font-size: 14px;">
+                            <i class="fas fa-user"></i> Full Name <span style="color: #e53935;">*</span>
+                        </label>
+                        <input type="text" id="volunteerName" name="volunteerName" required placeholder="e.g., Dr. Maria Santos" style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; transition: all 0.3s; box-sizing: border-box;">
+                    </div>
+                    <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #6A1B9A; margin-bottom: 8px; font-size: 14px;">
+                                <i class="fas fa-stethoscope"></i> Role <span style="color: #e53935;">*</span>
+                            </label>
+                            <select id="volunteerRole" name="volunteerRole" required style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; background: white; cursor: pointer; box-sizing: border-box;">
+                                <option value="">Select Role</option>
+                                <option value="General Physician">👨‍⚕️ General Physician</option>
+                                <option value="Nurse">👩‍⚕️ Nurse</option>
+                                <option value="Midwife">🤱 Midwife</option>
+                                <option value="Medical Technologist">🔬 Medical Technologist</option>
+                                <option value="Pharmacist">💊 Pharmacist</option>
+                                <option value="Dentist">🦷 Dentist</option>
+                                <option value="Health Worker">🏥 Health Worker</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #6A1B9A; margin-bottom: 8px; font-size: 14px;">
+                                <i class="fas fa-id-card"></i> License # <span style="color: #e53935;">*</span>
+                            </label>
+                            <input type="text" id="volunteerLicense" name="volunteerLicense" required placeholder="PRC-XXXXXXX" style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #6A1B9A; margin-bottom: 8px; font-size: 14px;">
+                            <i class="fas fa-phone"></i> Contact Number
+                        </label>
+                        <input type="tel" id="volunteerPhone" name="volunteerPhone" placeholder="+63 9XX XXX XXXX" style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; box-sizing: border-box;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #6A1B9A; margin-bottom: 8px; font-size: 14px;">
+                            <i class="fas fa-calendar-alt"></i> Availability Schedule <span style="color: #e53935;">*</span>
+                        </label>
+                        <input type="text" id="volunteerSchedule" name="volunteerSchedule" required placeholder="e.g., Mon, Wed, Fri - 8:00 AM to 5:00 PM" style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; box-sizing: border-box;">
+                    </div>
+                </form>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 12px; padding: 20px 28px; background: white; border-top: 1px solid #e8e8e8;">
+                <button type="button" onclick="closeAddVolunteerModal()" style="padding: 12px 28px; border: 2px solid #e0e0e0; border-radius: 10px; background: white; color: #666; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" onclick="saveNewVolunteer()" style="padding: 12px 28px; border: none; border-radius: 10px; background: linear-gradient(135deg, #9C27B0, #6A1B9A); color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(156,39,176,0.3); transition: all 0.3s;">
+                    <i class="fas fa-user-plus"></i> Add Volunteer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Test Modal -->
+    <div id="addTestModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeAddTestModal()"></div>
+        <div class="modal-content" style="max-width: 580px; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.25);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #FF5722 0%, #D84315 100%); padding: 24px 28px; position: relative;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-microscope" style="font-size: 22px; color: white;"></i>
+                    </div>
+                    <div>
+                        <h2 style="margin: 0; color: white; font-size: 20px; font-weight: 600;">Add New Medical Test</h2>
+                        <p style="margin: 4px 0 0 0; color: rgba(255,255,255,0.8); font-size: 13px;">Diagnostic Test Configuration</p>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeAddTestModal()" style="position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">×</button>
+            </div>
+            <div class="modal-body" style="padding: 28px; background: #fffaf8; max-height: 60vh; overflow-y: auto;">
+                <form id="addTestForm">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #D84315; margin-bottom: 8px; font-size: 14px;">
+                            <i class="fas fa-flask"></i> Test Name <span style="color: #e53935;">*</span>
+                        </label>
+                        <input type="text" id="testName" name="testName" required placeholder="e.g., Complete Blood Count (CBC)" style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; transition: all 0.3s; box-sizing: border-box;">
+                    </div>
+                    <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #D84315; margin-bottom: 8px; font-size: 14px;">
+                                <i class="fas fa-tag"></i> Category <span style="color: #e53935;">*</span>
+                            </label>
+                            <select id="testCategory" name="testCategory" required style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; background: white; cursor: pointer; box-sizing: border-box;">
+                                <option value="">Select Category</option>
+                                <option value="Blood Tests">🩸 Blood Tests</option>
+                                <option value="Vital Signs">❤️ Vital Signs</option>
+                                <option value="Imaging">📷 Imaging</option>
+                                <option value="Urinalysis">🧪 Urinalysis</option>
+                                <option value="Other">📋 Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #D84315; margin-bottom: 8px; font-size: 14px;">
+                                <i class="fas fa-clock"></i> Duration <span style="color: #e53935;">*</span>
+                            </label>
+                            <div style="position: relative;">
+                                <input type="number" id="testDuration" name="testDuration" required min="1" value="15" style="width: 100%; padding: 12px 16px; padding-right: 50px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; box-sizing: border-box;">
+                                <span style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #888; font-size: 13px;">mins</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #D84315; margin-bottom: 8px; font-size: 14px;">
+                            <i class="fas fa-align-left"></i> Description
+                        </label>
+                        <textarea id="testDescription" name="testDescription" rows="2" placeholder="Brief description of what this test measures..." style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; resize: none; box-sizing: border-box;"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 16px; margin-bottom: 10px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #D84315; margin-bottom: 8px; font-size: 14px;">
+                                <i class="fas fa-peso-sign"></i> Cost (₱)
+                            </label>
+                            <input type="number" id="testCost" name="testCost" min="0" value="0" placeholder="0 = Free" style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #D84315; margin-bottom: 8px; font-size: 14px;">
+                                <i class="fas fa-chart-line"></i> Normal Range
+                            </label>
+                            <input type="text" id="testNormalRange" name="testNormalRange" placeholder="e.g., 70-100 mg/dL" style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 12px; padding: 20px 28px; background: white; border-top: 1px solid #e8e8e8;">
+                <button type="button" onclick="closeAddTestModal()" style="padding: 12px 28px; border: 2px solid #e0e0e0; border-radius: 10px; background: white; color: #666; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" onclick="saveNewTest()" style="padding: 12px 28px; border: none; border-radius: 10px; background: linear-gradient(135deg, #FF5722, #D84315); color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(255,87,34,0.3); transition: all 0.3s;">
+                    <i class="fas fa-plus"></i> Add Test
                 </button>
             </div>
         </div>
