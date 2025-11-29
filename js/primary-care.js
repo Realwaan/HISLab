@@ -482,15 +482,21 @@ function formatDate(dateString) {
 function openNewPatientForm() {
     const modal = document.getElementById('newPatientModal');
     if (modal) {
-        modal.style.display = 'block';
+        modal.style.display = 'flex';
         modal.classList.add('active');
         
         // Reset form
-        document.getElementById('patientRegistrationForm').reset();
+        const form = document.getElementById('patientRegistrationForm');
+        if (form) form.reset();
         
         // Set current date for DOB field max
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('dateOfBirth').setAttribute('max', today);
+        const dobField = document.getElementById('dateOfBirth');
+        if (dobField) {
+            const today = new Date().toISOString().split('T')[0];
+            dobField.setAttribute('max', today);
+        }
+    } else {
+        console.error('New Patient Modal not found!');
     }
 }
 
