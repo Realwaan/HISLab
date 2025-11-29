@@ -304,22 +304,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize tabs functionality
 function initTabs() {
-    const tabBtns = document.querySelectorAll('.tab-btn');
+    // Tab functionality is handled by inline onclick="switchTab()" in HTML
+    // This function now just ensures the first tab is active on page load
     const tabContents = document.querySelectorAll('.tab-content');
+    const tabBtns = document.querySelectorAll('.tab-btn');
     
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tabName = this.getAttribute('data-tab');
-            
-            // Remove active class from all tabs and contents
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
-            
-            // Add active class to clicked tab and corresponding content
-            this.classList.add('active');
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-        });
+    // Ensure at least one tab is active
+    let hasActive = false;
+    tabContents.forEach(content => {
+        if (content.classList.contains('active')) {
+            hasActive = true;
+        }
     });
+    
+    // If no tab is active, activate the first one
+    if (!hasActive && tabContents.length > 0) {
+        tabContents[0].classList.add('active');
+        if (tabBtns.length > 0) {
+            tabBtns[0].classList.add('active');
+        }
+    }
+    
+    console.log('Tabs initialized');
 }
 
 // Setup event listeners
