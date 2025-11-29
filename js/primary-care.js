@@ -1277,50 +1277,269 @@ window.saveNewTest = saveNewTest;
 
 // All modal functions are now exported immediately after their definitions above
 
-// View test information
+// Comprehensive Medical Test Information (Sources: WHO, AHA, CDC, NIH)
+const medicalTestData = {
+    'blood-sugar': {
+        title: 'Blood Sugar (Glucose) Test',
+        icon: 'fa-tint',
+        color: '#2196F3',
+        description: 'Blood glucose testing measures the amount of sugar (glucose) in your blood. It is the primary test for diagnosing and monitoring diabetes.',
+        categories: [
+            {
+                name: 'Fasting Blood Sugar (FBS)',
+                subtitle: 'After 8+ hours of fasting',
+                ranges: [
+                    { label: 'Normal', value: '70-99 mg/dL (3.9-5.5 mmol/L)', color: '#4CAF50', icon: 'fa-check-circle' },
+                    { label: 'Prediabetes', value: '100-125 mg/dL (5.6-6.9 mmol/L)', color: '#FF9800', icon: 'fa-exclamation-triangle' },
+                    { label: 'Diabetes', value: '126 mg/dL or higher (7.0+ mmol/L)', color: '#F44336', icon: 'fa-times-circle' }
+                ]
+            },
+            {
+                name: 'Random Blood Sugar',
+                subtitle: 'Any time of day',
+                ranges: [
+                    { label: 'Normal', value: 'Below 140 mg/dL (7.8 mmol/L)', color: '#4CAF50', icon: 'fa-check-circle' },
+                    { label: 'Prediabetes', value: '140-199 mg/dL (7.8-11.0 mmol/L)', color: '#FF9800', icon: 'fa-exclamation-triangle' },
+                    { label: 'Diabetes', value: '200 mg/dL or higher (11.1+ mmol/L)', color: '#F44336', icon: 'fa-times-circle' }
+                ]
+            },
+            {
+                name: 'HbA1c (Glycated Hemoglobin)',
+                subtitle: 'Average blood sugar over 2-3 months',
+                ranges: [
+                    { label: 'Normal', value: 'Below 5.7%', color: '#4CAF50', icon: 'fa-check-circle' },
+                    { label: 'Prediabetes', value: '5.7% - 6.4%', color: '#FF9800', icon: 'fa-exclamation-triangle' },
+                    { label: 'Diabetes', value: '6.5% or higher', color: '#F44336', icon: 'fa-times-circle' }
+                ]
+            }
+        ],
+        tips: [
+            'Fast for at least 8 hours before a fasting blood sugar test',
+            'Stay hydrated with water during fasting',
+            'Avoid strenuous exercise before the test',
+            'Inform your healthcare provider about any medications'
+        ],
+        source: 'American Diabetes Association (ADA) Standards of Care 2024'
+    },
+    'blood-pressure': {
+        title: 'Blood Pressure Monitoring',
+        icon: 'fa-heart',
+        color: '#E91E63',
+        description: 'Blood pressure is the force of blood pushing against artery walls. It is measured in millimeters of mercury (mmHg) with two numbers: systolic (heart beating) over diastolic (heart resting).',
+        categories: [
+            {
+                name: 'Blood Pressure Categories',
+                subtitle: 'Based on AHA/ACC 2017 Guidelines',
+                ranges: [
+                    { label: 'Normal', value: 'Systolic < 120 AND Diastolic < 80 mmHg', color: '#4CAF50', icon: 'fa-check-circle' },
+                    { label: 'Elevated', value: 'Systolic 120-129 AND Diastolic < 80 mmHg', color: '#8BC34A', icon: 'fa-arrow-up' },
+                    { label: 'High BP Stage 1', value: 'Systolic 130-139 OR Diastolic 80-89 mmHg', color: '#FF9800', icon: 'fa-exclamation-triangle' },
+                    { label: 'High BP Stage 2', value: 'Systolic ≥ 140 OR Diastolic ≥ 90 mmHg', color: '#FF5722', icon: 'fa-exclamation-circle' },
+                    { label: 'Hypertensive Crisis', value: 'Systolic > 180 AND/OR Diastolic > 120 mmHg', color: '#F44336', icon: 'fa-times-circle' }
+                ]
+            }
+        ],
+        tips: [
+            'Rest for 5 minutes before measurement',
+            'Sit with feet flat on floor, back supported',
+            'Arm should be at heart level',
+            'Avoid caffeine, exercise, and smoking 30 min before',
+            'Take multiple readings and record the average',
+            'Measure at the same time each day for consistency'
+        ],
+        source: 'American Heart Association (AHA) & American College of Cardiology (ACC) 2017'
+    },
+    'bmi': {
+        title: 'Body Mass Index (BMI) Assessment',
+        icon: 'fa-weight',
+        color: '#9C27B0',
+        description: 'BMI is a measure of body fat based on height and weight. Formula: BMI = weight (kg) ÷ height² (m²). It is a screening tool, not a diagnostic measure.',
+        categories: [
+            {
+                name: 'Adult BMI Categories',
+                subtitle: 'For adults 20 years and older',
+                ranges: [
+                    { label: 'Underweight', value: 'BMI < 18.5', color: '#2196F3', icon: 'fa-arrow-down' },
+                    { label: 'Normal Weight', value: 'BMI 18.5 - 24.9', color: '#4CAF50', icon: 'fa-check-circle' },
+                    { label: 'Overweight', value: 'BMI 25.0 - 29.9', color: '#FF9800', icon: 'fa-exclamation-triangle' },
+                    { label: 'Obesity Class I', value: 'BMI 30.0 - 34.9', color: '#FF5722', icon: 'fa-exclamation-circle' },
+                    { label: 'Obesity Class II', value: 'BMI 35.0 - 39.9', color: '#E91E63', icon: 'fa-times-circle' },
+                    { label: 'Obesity Class III', value: 'BMI ≥ 40', color: '#F44336', icon: 'fa-times-circle' }
+                ]
+            },
+            {
+                name: 'Asian BMI Categories',
+                subtitle: 'WHO recommendations for Asian populations',
+                ranges: [
+                    { label: 'Underweight', value: 'BMI < 18.5', color: '#2196F3', icon: 'fa-arrow-down' },
+                    { label: 'Normal Weight', value: 'BMI 18.5 - 22.9', color: '#4CAF50', icon: 'fa-check-circle' },
+                    { label: 'Overweight', value: 'BMI 23.0 - 24.9', color: '#FF9800', icon: 'fa-exclamation-triangle' },
+                    { label: 'Obesity', value: 'BMI ≥ 25', color: '#F44336', icon: 'fa-times-circle' }
+                ]
+            }
+        ],
+        tips: [
+            'BMI does not measure body fat directly',
+            'Athletes may have high BMI due to muscle mass',
+            'Consider waist circumference as additional measure',
+            'Children and teens use age-specific BMI percentiles',
+            'Consult healthcare provider for comprehensive assessment'
+        ],
+        source: 'World Health Organization (WHO) & CDC Guidelines'
+    },
+    'respiratory': {
+        title: 'Respiratory Assessment',
+        icon: 'fa-lungs',
+        color: '#00BCD4',
+        description: 'Respiratory assessment evaluates lung function through oxygen saturation (SpO2), respiratory rate, and basic lung sounds. It is crucial for detecting respiratory conditions.',
+        categories: [
+            {
+                name: 'Oxygen Saturation (SpO2)',
+                subtitle: 'Measured by pulse oximeter',
+                ranges: [
+                    { label: 'Normal', value: '95% - 100%', color: '#4CAF50', icon: 'fa-check-circle' },
+                    { label: 'Mild Hypoxemia', value: '91% - 94%', color: '#FF9800', icon: 'fa-exclamation-triangle' },
+                    { label: 'Moderate Hypoxemia', value: '86% - 90%', color: '#FF5722', icon: 'fa-exclamation-circle' },
+                    { label: 'Severe Hypoxemia', value: 'Below 85%', color: '#F44336', icon: 'fa-times-circle' }
+                ]
+            },
+            {
+                name: 'Respiratory Rate (Adults)',
+                subtitle: 'Breaths per minute at rest',
+                ranges: [
+                    { label: 'Normal', value: '12 - 20 breaths/min', color: '#4CAF50', icon: 'fa-check-circle' },
+                    { label: 'Tachypnea (Fast)', value: '> 20 breaths/min', color: '#FF9800', icon: 'fa-arrow-up' },
+                    { label: 'Bradypnea (Slow)', value: '< 12 breaths/min', color: '#2196F3', icon: 'fa-arrow-down' }
+                ]
+            },
+            {
+                name: 'Peak Expiratory Flow (PEF)',
+                subtitle: 'For asthma monitoring',
+                ranges: [
+                    { label: 'Green Zone', value: '80% - 100% of personal best', color: '#4CAF50', icon: 'fa-check-circle' },
+                    { label: 'Yellow Zone', value: '50% - 79% of personal best', color: '#FF9800', icon: 'fa-exclamation-triangle' },
+                    { label: 'Red Zone', value: 'Below 50% of personal best', color: '#F44336', icon: 'fa-times-circle' }
+                ]
+            }
+        ],
+        tips: [
+            'Remove nail polish for accurate pulse oximeter readings',
+            'Warm hands if cold for better readings',
+            'Count respirations for a full 60 seconds',
+            'Note breathing effort and use of accessory muscles',
+            'Seek immediate care if SpO2 drops below 92%'
+        ],
+        source: 'National Institutes of Health (NIH) & WHO Guidelines'
+    }
+};
+
+// View test information - creates beautiful modal
 function viewTestInfo(testType) {
     console.log('Viewing test info:', testType);
     
-    const testInfo = {
-        'blood-sugar': {
-            title: 'Blood Sugar Test Interpretation',
-            normal: 'Fasting: 70-100 mg/dL | Random: < 140 mg/dL',
-            prediabetes: 'Fasting: 100-125 mg/dL | Random: 140-199 mg/dL',
-            diabetes: 'Fasting: ≥ 126 mg/dL | Random: ≥ 200 mg/dL'
-        },
-        'blood-pressure': {
-            title: 'Blood Pressure Interpretation',
-            normal: 'Systolic: < 120 mmHg | Diastolic: < 80 mmHg',
-            elevated: 'Systolic: 120-129 mmHg | Diastolic: < 80 mmHg',
-            hypertension: 'Systolic: ≥ 130 mmHg | Diastolic: ≥ 80 mmHg'
-        },
-        'bmi': {
-            title: 'BMI Interpretation',
-            underweight: 'BMI < 18.5',
-            normal: 'BMI: 18.5-24.9',
-            overweight: 'BMI: 25-29.9',
-            obese: 'BMI ≥ 30'
-        },
-        'respiratory': {
-            title: 'Respiratory Assessment',
-            normal: 'O2 Saturation: ≥ 95% | Respiratory Rate: 12-20 breaths/min',
-            concern: 'O2 Saturation: 90-94% | May need supplemental oxygen',
-            critical: 'O2 Saturation: < 90% | Immediate medical attention required'
-        }
-    };
+    const data = medicalTestData[testType];
+    if (!data) {
+        alert('Test information not available');
+        return;
+    }
     
-    const info = testInfo[testType];
-    if (info) {
-        let message = `${info.title}\n\n`;
-        for (let key in info) {
-            if (key !== 'title') {
-                message += `${key.toUpperCase()}: ${info[key]}\n`;
-            }
-        }
-        alert(message);
+    // Build modal content
+    let categoriesHTML = data.categories.map(cat => `
+        <div style="margin-bottom: 24px;">
+            <h4 style="color: #333; font-size: 16px; margin: 0 0 4px 0; font-weight: 600;">${cat.name}</h4>
+            <p style="color: #666; font-size: 13px; margin: 0 0 12px 0;">${cat.subtitle}</p>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                ${cat.ranges.map(range => `
+                    <div style="display: flex; align-items: center; padding: 12px 16px; background: linear-gradient(135deg, ${range.color}15 0%, ${range.color}08 100%); border-left: 4px solid ${range.color}; border-radius: 8px;">
+                        <i class="fas ${range.icon}" style="color: ${range.color}; font-size: 18px; margin-right: 12px; width: 24px; text-align: center;"></i>
+                        <div style="flex: 1;">
+                            <span style="font-weight: 600; color: ${range.color}; font-size: 14px;">${range.label}</span>
+                            <span style="color: #555; font-size: 13px; margin-left: 8px;">${range.value}</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+    
+    let tipsHTML = data.tips.map(tip => `
+        <li style="margin-bottom: 8px; color: #555; font-size: 13px;">
+            <i class="fas fa-check" style="color: #4CAF50; margin-right: 8px; font-size: 11px;"></i>${tip}
+        </li>
+    `).join('');
+    
+    const modalContent = `
+        <div class="modal-header" style="background: linear-gradient(135deg, ${data.color} 0%, ${data.color}CC 100%); padding: 28px 32px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -50%; right: -30px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+            <div style="position: absolute; bottom: -60%; left: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.08); border-radius: 50%;"></div>
+            <div style="display: flex; align-items: center; gap: 16px; position: relative; z-index: 1;">
+                <div style="width: 56px; height: 56px; background: rgba(255,255,255,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                    <i class="fas ${data.icon}" style="font-size: 26px; color: white;"></i>
+                </div>
+                <div>
+                    <h2 style="margin: 0; color: white; font-size: 22px; font-weight: 600;">${data.title}</h2>
+                    <p style="margin: 4px 0 0 0; color: rgba(255,255,255,0.85); font-size: 13px;">Medical Interpretation Guide</p>
+                </div>
+            </div>
+            <button onclick="closeTestInfoModal()" style="position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; border: none; background: rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; backdrop-filter: blur(4px);" onmouseover="this.style.background='rgba(255,255,255,0.35)';this.style.transform='rotate(90deg)'" onmouseout="this.style.background='rgba(255,255,255,0.2)';this.style.transform='rotate(0deg)'">×</button>
+        </div>
+        
+        <div class="modal-body" style="padding: 28px 32px; max-height: 60vh; overflow-y: auto; background: linear-gradient(180deg, #f8f9fa 0%, white 100%);">
+            <p style="color: #555; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0; padding: 16px; background: #f0f7ff; border-radius: 10px; border-left: 4px solid ${data.color};">
+                <i class="fas fa-info-circle" style="color: ${data.color}; margin-right: 8px;"></i>
+                ${data.description}
+            </p>
+            
+            ${categoriesHTML}
+            
+            <div style="background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%); border-radius: 12px; padding: 20px; margin-top: 8px;">
+                <h4 style="color: #2E7D32; font-size: 15px; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-lightbulb" style="color: #66BB6A;"></i> Preparation Tips
+                </h4>
+                <ul style="margin: 0; padding: 0; list-style: none;">
+                    ${tipsHTML}
+                </ul>
+            </div>
+        </div>
+        
+        <div style="padding: 16px 32px 20px; background: white; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+            <p style="margin: 0; font-size: 11px; color: #888;">
+                <i class="fas fa-book-medical" style="margin-right: 6px;"></i>
+                Source: ${data.source}
+            </p>
+            <button onclick="closeTestInfoModal()" style="padding: 10px 24px; border: none; border-radius: 8px; background: linear-gradient(135deg, ${data.color} 0%, ${data.color}CC 100%); color: white; font-weight: 600; cursor: pointer; font-size: 13px; transition: all 0.3s; box-shadow: 0 4px 12px ${data.color}40;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px ${data.color}50'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px ${data.color}40'">
+                Got It
+            </button>
+        </div>
+    `;
+    
+    const modal = document.getElementById('testInfoModal');
+    const content = document.getElementById('testInfoContent');
+    
+    if (modal && content) {
+        content.innerHTML = modalContent;
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+    }
+}
+
+function closeTestInfoModal() {
+    const modal = document.getElementById('testInfoModal');
+    const content = document.getElementById('testInfoContent');
+    
+    if (modal) {
+        if (content) content.classList.add('closing');
+        modal.classList.add('closing');
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+            modal.classList.remove('active', 'closing');
+            if (content) content.classList.remove('closing');
+        }, 300);
     }
 }
 
 // Export functions
 window.viewPatient = viewPatient;
 window.viewTestInfo = viewTestInfo;
+window.closeTestInfoModal = closeTestInfoModal;
