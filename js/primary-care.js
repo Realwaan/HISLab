@@ -480,7 +480,9 @@ function formatDate(dateString) {
 
 // Open new patient form
 function openNewPatientForm() {
+    console.log('openNewPatientForm called');
     const modal = document.getElementById('newPatientModal');
+    console.log('Modal element:', modal);
     if (modal) {
         modal.style.display = 'flex';
         modal.classList.add('active');
@@ -497,8 +499,11 @@ function openNewPatientForm() {
         }
     } else {
         console.error('New Patient Modal not found!');
+        alert('Error: Modal not found. Please refresh the page.');
     }
 }
+// Make available immediately
+window.openNewPatientForm = openNewPatientForm;
 
 // Close new patient modal
 function closeNewPatientModal() {
@@ -508,6 +513,7 @@ function closeNewPatientModal() {
         modal.classList.remove('active');
     }
 }
+window.closeNewPatientModal = closeNewPatientModal;
 
 // Calculate age from date of birth
 function calculateAge() {
@@ -650,6 +656,7 @@ async function saveNewPatient() {
         openPatientRecordModal(patientData);
     }, 500);
 }
+window.saveNewPatient = saveNewPatient;
 
 // ============================================
 // MEDICAL RECORD FUNCTIONS
