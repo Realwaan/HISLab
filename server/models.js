@@ -117,7 +117,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    role: { type: String, enum: ['Admin', 'Doctor', 'Nurse', 'Staff', 'Receptionist'], default: 'Staff' },
+    role: { type: String, default: 'Staff' },
     isActive: { type: Boolean, default: true },
     lastLogin: { type: Date },
     createdAt: { type: Date, default: Date.now }
