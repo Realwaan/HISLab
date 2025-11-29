@@ -41,6 +41,36 @@ function logout() {
     window.location.href = '../index.html';
 }
 
+// Tab switching function
+function switchTab(tabId, btnElement) {
+    console.log('Switching to tab:', tabId);
+    
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Remove active class from all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Add active class to clicked button
+    if (btnElement) {
+        btnElement.classList.add('active');
+    }
+    
+    // Add active class to target tab content
+    const tabContent = document.getElementById(tabId);
+    if (tabContent) {
+        tabContent.classList.add('active');
+        console.log('Tab content activated:', tabId);
+    } else {
+        console.error('Tab content not found:', tabId);
+    }
+}
+window.switchTab = switchTab;
+
 // Initialize data on page load
 function initializeData() {
     // Load from localStorage first
