@@ -2,87 +2,273 @@
 // PRIMARY CARE SERVICES JAVASCRIPT
 // ============================================
 
-// Data Storage
-let patients = JSON.parse(localStorage.getItem('clinikabayan_patients')) || [];
-let supplies = JSON.parse(localStorage.getItem('clinikabayan_supplies')) || [];
-let volunteers = JSON.parse(localStorage.getItem('clinikabayan_volunteers')) || [];
-let tests = JSON.parse(localStorage.getItem('clinikabayan_tests')) || [];
-let currentPatientId = parseInt(localStorage.getItem('clinikabayan_lastPatientId') || '0');
+// API Configuration
+const USE_API = false; // Set to false - only using MongoDB for login/signup
 
-// Initialize sample data if empty
-if (patients.length === 0) {
-    patients = [
-        {
-            id: 'CK-2025-001',
-            firstName: 'Maria',
-            lastName: 'Santos',
-            age: 34,
-            gender: 'Female',
-            address: 'Barangay San Jose, Cebu City',
-            lastVisit: '2025-11-20',
-            status: 'active',
-            condition: 'Prenatal Care',
-            phone: '+63 912 345 6789'
-        },
-        {
-            id: 'CK-2025-002',
-            firstName: 'Juan',
-            lastName: 'Reyes',
-            age: 56,
-            gender: 'Male',
-            address: 'Barangay Talamban, Cebu City',
-            lastVisit: '2025-11-24',
-            status: 'ongoing',
-            condition: 'Hypertension Management',
-            phone: '+63 917 654 3210'
-        },
-        {
-            id: 'CK-2025-003',
-            firstName: 'Ana',
-            lastName: 'Lopez',
-            age: 12,
-            gender: 'Female',
-            address: 'Barangay Lahug, Cebu City',
-            lastVisit: '2025-11-22',
-            status: 'active',
-            condition: 'Regular Checkup',
-            phone: '+63 919 876 5432'
+// Data Storage - Start with empty, will be populated on load
+let patients = [];
+let supplies = [];
+let volunteers = [];
+let tests = [];
+let currentPatientId = 0;
+
+// Authentication check
+function checkAuth() {
+    const isAuthenticated = localStorage.getItem('isAuthenticated');
+    if (!isAuthenticated) {
+        window.location.href = '../index.html';
+        return;
+    }
+    
+    // Set user info if elements exist
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    const userNameEl = document.getElementById('userName');
+    const welcomeNameEl = document.getElementById('welcomeName');
+    
+    if (userData.name && userNameEl) {
+        userNameEl.textContent = userData.name;
+    }
+    if (userData.name && welcomeNameEl) {
+        welcomeNameEl.textContent = userData.name;
+    }
+}
+
+// Logout function
+function logout() {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('authToken');
+    window.location.href = '../index.html';
+}
+
+// Initialize data on page load
+function initializeData() {
+    // Load from localStorage first
+    const storedPatients = localStorage.getItem('clinikabayan_patients');
+    const storedSupplies = localStorage.getItem('clinikabayan_supplies');
+    const storedVolunteers = localStorage.getItem('clinikabayan_volunteers');
+    
+    if (storedPatients) {
+        try {
+            const parsed = JSON.parse(storedPatients);
+            let idCounter = 1;
+            
+            // Normalize patient data - ensure each patient has required flat fields
+            patients = parsed.map((p, index) => {
+                // Generate ID if missing
+                const generateId = () => {
+                    const year = new Date().getFullYear();
+                    return `CK-${year}-${String(idCounter++).padStart(3, '0')}`;
+                };
+                
+                // Handle nested personalInfo structure
+                if (p.personalInfo) {
+                    const patientId = p.id || p._id || p.patientId || generateId();
+                    return {
+                        id: patientId,
+                        firstName: p.personalInfo.firstName || '',
+                        lastName: p.personalInfo.lastName || '',
+                        age: parseInt(p.personalInfo.age) || 0,
+                        gender: p.personalInfo.sex || p.personalInfo.gender || '',
+                        address: p.contactInfo ? `${p.contactInfo.barangay || ''}, ${p.contactInfo.city || ''}`.replace(/^, |, $/g, '') : (p.address || ''),
+                        lastVisit: p.lastVisit || new Date().toISOString().split('T')[0],
+                        status: (p.status || 'active').toLowerCase(),
+                        condition: p.condition || 'General Checkup',
+                        phone: p.contactInfo?.contactNumber || p.phone || ''
+                    };
+                }
+                
+                // Already flat structure
+                const patientId = p.id || p._id || p.patientId || generateId();
+                return {
+                    id: patientId,
+                    firstName: p.firstName || '',
+                    lastName: p.lastName || '',
+                    age: parseInt(p.age) || 0,
+                    gender: p.gender || p.sex || '',
+                    address: p.address || '',
+                    lastVisit: p.lastVisit || new Date().toISOString().split('T')[0],
+                    status: (p.status || 'active').toLowerCase(),
+                    condition: p.condition || 'General Checkup',
+                    phone: p.phone || p.contactNumber || ''
+                };
+            });
+            
+            // Update currentPatientId based on existing IDs
+            patients.forEach(p => {
+                const match = p.id.match(/CK-\d+-(\d+)/);
+                if (match) {
+                    const num = parseInt(match[1]);
+                    if (num >= currentPatientId) currentPatientId = num;
+                }
+            });
+            
+            // Save normalized data back
+            localStorage.setItem('clinikabayan_patients', JSON.stringify(patients));
+            console.log('Initialized', patients.length, 'patients from localStorage');
+        } catch (e) {
+            console.error('Error parsing patients:', e);
+            patients = [];
         }
-    ];
-    currentPatientId = 3;
-    localStorage.setItem('clinikabayan_patients', JSON.stringify(patients));
-    localStorage.setItem('clinikabayan_lastPatientId', currentPatientId);
+    }
+    
+    if (storedSupplies) {
+        try {
+            supplies = JSON.parse(storedSupplies);
+        } catch (e) {
+            supplies = [];
+        }
+    }
+    
+    if (storedVolunteers) {
+        try {
+            volunteers = JSON.parse(storedVolunteers);
+        } catch (e) {
+            volunteers = [];
+        }
+    }
+    
+    currentPatientId = parseInt(localStorage.getItem('clinikabayan_lastPatientId') || '0');
+    
+    // Initialize sample data if empty
+    if (patients.length === 0) {
+        patients = [
+            {
+                id: 'CK-2025-001',
+                firstName: 'Maria',
+                lastName: 'Santos',
+                age: 34,
+                gender: 'Female',
+                address: 'Barangay San Jose, Cebu City',
+                lastVisit: '2025-11-20',
+                status: 'active',
+                condition: 'Prenatal Care',
+                phone: '+63 912 345 6789'
+            },
+            {
+                id: 'CK-2025-002',
+                firstName: 'Juan',
+                lastName: 'Reyes',
+                age: 56,
+                gender: 'Male',
+                address: 'Barangay Talamban, Cebu City',
+                lastVisit: '2025-11-24',
+                status: 'ongoing',
+                condition: 'Hypertension Management',
+                phone: '+63 917 654 3210'
+            },
+            {
+                id: 'CK-2025-003',
+                firstName: 'Ana',
+                lastName: 'Lopez',
+                age: 12,
+                gender: 'Female',
+                address: 'Barangay Lahug, Cebu City',
+                lastVisit: '2025-11-22',
+                status: 'active',
+                condition: 'Regular Checkup',
+                phone: '+63 919 876 5432'
+            }
+        ];
+        currentPatientId = 3;
+        localStorage.setItem('clinikabayan_patients', JSON.stringify(patients));
+        localStorage.setItem('clinikabayan_lastPatientId', currentPatientId.toString());
+    }
+
+    if (supplies.length === 0) {
+        supplies = [
+            { id: 1, name: 'Paracetamol 500mg', quantity: 450, reorderLevel: 200, status: 'adequate', category: 'Medication' },
+            { id: 2, name: 'Amoxicillin 500mg', quantity: 180, reorderLevel: 150, status: 'adequate', category: 'Antibiotics' },
+            { id: 3, name: 'Blood Pressure Monitor', quantity: 8, reorderLevel: 5, status: 'adequate', category: 'Equipment' },
+            { id: 4, name: 'Surgical Gloves', quantity: 85, reorderLevel: 100, status: 'low', category: 'Supplies' },
+            { id: 5, name: 'Insulin', quantity: 25, reorderLevel: 50, status: 'critical', category: 'Medication' }
+        ];
+        localStorage.setItem('clinikabayan_supplies', JSON.stringify(supplies));
+    }
+
+    if (volunteers.length === 0) {
+        volunteers = [
+            { id: 1, name: 'Dr. Pedro Garcia', role: 'General Physician', license: 'MD-12345', status: 'available', schedule: 'Mon, Wed, Fri' },
+            { id: 2, name: 'Nurse Rosa Martinez', role: 'Registered Nurse', license: 'RN-67890', status: 'available', schedule: 'Tue, Thu, Sat' },
+            { id: 3, name: 'Dr. Elena Cruz', role: 'Pediatrician', license: 'MD-54321', status: 'busy', schedule: 'Mon, Thu' }
+        ];
+        localStorage.setItem('clinikabayan_volunteers', JSON.stringify(volunteers));
+    }
+    
+    console.log('Data initialized. Patients:', patients.length, 'Supplies:', supplies.length);
 }
 
-if (supplies.length === 0) {
-    supplies = [
-        { id: 1, name: 'Paracetamol 500mg', quantity: 450, reorderLevel: 200, status: 'adequate', category: 'Medication' },
-        { id: 2, name: 'Amoxicillin 500mg', quantity: 180, reorderLevel: 150, status: 'adequate', category: 'Antibiotics' },
-        { id: 3, name: 'Blood Pressure Monitor', quantity: 8, reorderLevel: 5, status: 'adequate', category: 'Equipment' },
-        { id: 4, name: 'Surgical Gloves', quantity: 85, reorderLevel: 100, status: 'low', category: 'Supplies' },
-        { id: 5, name: 'Insulin', quantity: 25, reorderLevel: 50, status: 'critical', category: 'Medication' }
-    ];
-    localStorage.setItem('clinikabayan_supplies', JSON.stringify(supplies));
-}
-
-if (volunteers.length === 0) {
-    volunteers = [
-        { id: 1, name: 'Dr. Pedro Garcia', role: 'General Physician', license: 'MD-12345', status: 'available', schedule: 'Mon, Wed, Fri' },
-        { id: 2, name: 'Nurse Rosa Martinez', role: 'Registered Nurse', license: 'RN-67890', status: 'available', schedule: 'Tue, Thu, Sat' },
-        { id: 3, name: 'Dr. Elena Cruz', role: 'Pediatrician', license: 'MD-54321', status: 'busy', schedule: 'Mon, Thu' }
-    ];
-    localStorage.setItem('clinikabayan_volunteers', JSON.stringify(volunteers));
+// Load data from API
+async function loadDataFromAPI() {
+    if (!USE_API || typeof api === 'undefined') return;
+    
+    try {
+        console.log('Loading Primary Care data from API...');
+        
+        // Load patients from API
+        const apiPatients = await api.getPatients();
+        if (apiPatients && apiPatients.length > 0) {
+            patients = apiPatients.map(p => ({
+                id: p.patientId || p._id,
+                _id: p._id,
+                firstName: p.firstName,
+                lastName: p.lastName,
+                age: p.age,
+                gender: p.gender,
+                address: p.address,
+                lastVisit: p.lastVisit ? new Date(p.lastVisit).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                status: p.status || 'active',
+                condition: p.condition || 'General Checkup',
+                phone: p.phone || p.contactNumber
+            }));
+            console.log('Loaded', patients.length, 'patients from API');
+        }
+        
+        // Load inventory/supplies from API
+        const apiInventory = await api.getInventory();
+        if (apiInventory && apiInventory.length > 0) {
+            supplies = apiInventory.map(s => ({
+                id: s._id,
+                name: s.name,
+                quantity: s.quantity,
+                reorderLevel: s.reorderLevel,
+                status: s.quantity > s.reorderLevel ? 'adequate' : (s.quantity > 0 ? 'low' : 'critical'),
+                category: s.category
+            }));
+            console.log('Loaded', supplies.length, 'supplies from API');
+        }
+        
+        // Update UI
+        renderPatients();
+        renderSupplies();
+        
+    } catch (error) {
+        console.error('Error loading data from API:', error);
+        // Fall back to localStorage
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Primary Care page loading...');
     checkAuth();
+    
+    // Initialize data first
+    initializeData();
+    
     initTabs();
     setupEventListeners();
+    
+    // Render with local data first
     renderPatients();
     renderSupplies();
     renderVolunteers();
     renderTests();
+    
+    // Then try to load from API (will update UI if successful)
+    if (USE_API && typeof api !== 'undefined') {
+        loadDataFromAPI();
+    }
+    
     console.log('Primary Care page loaded successfully');
 });
 
@@ -175,10 +361,10 @@ function renderPatients(filter = 'all', searchQuery = '') {
     if (searchQuery) {
         const query = searchQuery.toLowerCase();
         filtered = filtered.filter(p => 
-            p.firstName.toLowerCase().includes(query) ||
-            p.lastName.toLowerCase().includes(query) ||
-            p.id.toLowerCase().includes(query) ||
-            p.address.toLowerCase().includes(query)
+            (p.firstName || '').toLowerCase().includes(query) ||
+            (p.lastName || '').toLowerCase().includes(query) ||
+            (p.id || '').toString().toLowerCase().includes(query) ||
+            (p.address || '').toLowerCase().includes(query)
         );
     }
     
@@ -187,26 +373,29 @@ function renderPatients(filter = 'all', searchQuery = '') {
         return;
     }
     
-    grid.innerHTML = filtered.map(patient => `
-        <div class="patient-card" onclick="viewPatientDetails('${patient.id}')">
+    // Make sure each patient has an id
+    grid.innerHTML = filtered.map(patient => {
+        const patientId = patient.id || patient._id || patient.patientId || 'unknown';
+        return `
+        <div class="patient-card" onclick="viewPatientDetails('${patientId}')">
             <div class="patient-header">
                 <div class="patient-avatar ${patient.gender === 'Male' ? 'male' : ''}">
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="patient-basic-info">
-                    <h4>${patient.firstName} ${patient.lastName}</h4>
-                    <p class="patient-id">ID: ${patient.id}</p>
+                    <h4>${patient.firstName || ''} ${patient.lastName || ''}</h4>
+                    <p class="patient-id">ID: ${patientId}</p>
                 </div>
-                <span class="badge badge-${patient.status === 'active' ? 'success' : patient.status === 'ongoing' ? 'warning' : 'primary'}">${patient.status}</span>
+                <span class="badge badge-${patient.status === 'active' ? 'success' : patient.status === 'ongoing' ? 'warning' : 'primary'}">${patient.status || 'active'}</span>
             </div>
             <div class="patient-details">
                 <div class="detail-item">
                     <i class="fas fa-birthday-cake"></i>
-                    <span>${patient.age} years old, ${patient.gender}</span>
+                    <span>${patient.age || 'N/A'} years old, ${patient.gender || 'N/A'}</span>
                 </div>
                 <div class="detail-item">
                     <i class="fas fa-map-marker-alt"></i>
-                    <span>${patient.address}</span>
+                    <span>${patient.address || 'No address'}</span>
                 </div>
                 <div class="detail-item">
                     <i class="fas fa-calendar"></i>
@@ -218,7 +407,7 @@ function renderPatients(filter = 'all', searchQuery = '') {
                 </div>
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 function renderSupplies() {
@@ -332,7 +521,7 @@ function calculateAge() {
 }
 
 // Save new patient
-function saveNewPatient() {
+async function saveNewPatient() {
     const form = document.getElementById('patientRegistrationForm');
     
     // Validate form
@@ -388,6 +577,36 @@ function saveNewPatient() {
         status: 'Active'
     };
     
+    // Create API-compatible patient data
+    const apiPatientData = {
+        patientId: patientId,
+        firstName: patientData.personalInfo.firstName,
+        lastName: patientData.personalInfo.lastName,
+        dateOfBirth: patientData.personalInfo.dateOfBirth,
+        age: parseInt(patientData.personalInfo.age),
+        gender: patientData.personalInfo.sex,
+        address: `${patientData.contactInfo.barangay}, ${patientData.contactInfo.city}`,
+        phone: patientData.contactInfo.contactNumber,
+        email: patientData.contactInfo.email,
+        emergencyContact: patientData.emergencyContact,
+        bloodType: patientData.personalInfo.bloodType,
+        status: 'active',
+        condition: 'New Patient - Pending Consultation',
+        lastVisit: new Date().toISOString()
+    };
+    
+    // Try to save to API
+    if (USE_API && typeof api !== 'undefined') {
+        try {
+            const result = await api.createPatient(apiPatientData);
+            console.log('Patient saved to API:', result);
+            showNotification(`Patient registered successfully! ID: ${patientId}`, 'success');
+        } catch (error) {
+            console.error('Error saving patient to API:', error);
+            showNotification('Error saving to database. Saved locally.', 'warning');
+        }
+    }
+    
     // Also create simplified version for patient list
     const simplePatient = {
         id: patientId,
@@ -402,23 +621,17 @@ function saveNewPatient() {
         phone: patientData.contactInfo.contactNumber
     };
     
-    // Save to storage
-    patients.push(patientData);
+    // Add to patients array (use simplePatient for consistency)
+    patients.push(simplePatient);
     
-    // Add to patient list for rendering (if not already there)
-    const patientsList = JSON.parse(localStorage.getItem('clinikabayan_patients')) || [];
-    if (!patientsList.find(p => p.id === simplePatient.id)) {
-        patientsList.push(simplePatient);
-        localStorage.setItem('clinikabayan_patients', JSON.stringify(patientsList));
-    }
-    
-    localStorage.setItem('clinikabayan_lastPatientId', currentPatientId);
-    
-    // Update patient data with simplified version
-    patients = patientsList;
+    // Also save to localStorage
+    localStorage.setItem('clinikabayan_patients', JSON.stringify(patients));
+    localStorage.setItem('clinikabayan_lastPatientId', currentPatientId.toString());
     
     // Show success message
-    showNotification(`Patient registered successfully! ID: ${patientId}`, 'success');
+    if (!USE_API) {
+        showNotification(`Patient registered successfully! ID: ${patientId}`, 'success');
+    }
     
     // Close registration modal
     closeNewPatientModal();
@@ -612,14 +825,6 @@ function addPatientCard(patient) {
     patientsGrid.insertAdjacentHTML('afterbegin', cardHTML);
 }
 
-// View patient details
-function viewPatientDetails(patientId) {
-    const patient = patients.find(p => p.id === patientId);
-    if (patient) {
-        openPatientRecordModal(patient);
-    }
-}
-
 // Refresh patient list
 function refreshPatientList() {
     // Reload page or update patient cards
@@ -656,7 +861,26 @@ window.contactVolunteer = contactVolunteer;
 window.viewVolunteerDetails = viewVolunteerDetails;
 window.logout = logout;
 
+// Debug helpers - can be called from browser console
+window.debugPatients = function() {
+    console.log('=== DEBUG: Current Patients ===');
+    console.log('Total:', patients.length);
+    patients.forEach((p, i) => {
+        console.log(`[${i}] ID: ${p.id}, Name: ${p.firstName} ${p.lastName}`);
+    });
+    return patients;
+};
+
+window.resetPatientData = function() {
+    if (confirm('This will clear all patient data and reload sample data. Continue?')) {
+        localStorage.removeItem('clinikabayan_patients');
+        localStorage.removeItem('clinikabayan_lastPatientId');
+        window.location.reload();
+    }
+};
+
 console.log('All Primary Care functions exposed globally');
+console.log('Debug: Run debugPatients() or resetPatientData() in console if needed');
 
 // Search patients
 function searchPatients(query) {
@@ -674,14 +898,80 @@ function filterPatientsByStatus(status) {
 
 // View patient details (full modal)
 function viewPatientDetails(patientId) {
-    console.log('Viewing patient details:', patientId);
-    const patient = patients.find(p => p.id === patientId);
-    if (!patient) {
-        alert('Patient not found!');
+    console.log('=== viewPatientDetails called ===');
+    console.log('Looking for patient ID:', patientId, 'Type:', typeof patientId);
+    console.log('Current patients array length:', patients.length);
+    
+    // Debug: show all patient IDs
+    console.log('All patient IDs:', patients.map(p => ({
+        id: p.id,
+        _id: p._id,
+        patientId: p.patientId
+    })));
+    
+    // Handle special case of 'unknown' ID
+    if (patientId === 'unknown') {
+        console.error('Patient has unknown ID - data issue');
+        showNotification('This patient has no valid ID. Please re-register them.', 'warning');
         return;
     }
     
-    alert(`Patient Details\n\nID: ${patient.id}\nName: ${patient.firstName} ${patient.lastName}\nAge: ${patient.age}\nGender: ${patient.gender}\nAddress: ${patient.address}\nPhone: ${patient.phone || 'N/A'}\nLast Visit: ${formatDate(patient.lastVisit)}\nStatus: ${patient.status}\nCondition: ${patient.condition}\n\nIn the full application, this would open a detailed modal with:\n- Complete medical history\n- Vital signs chart\n- Lab results\n- Prescriptions\n- Appointment history`);
+    // Search by id, _id, or patientId - be very flexible
+    const patient = patients.find(p => {
+        const pId = String(p.id || p._id || p.patientId || '');
+        const searchId = String(patientId);
+        const match = pId === searchId || pId.toLowerCase() === searchId.toLowerCase();
+        if (match) console.log('Match found:', pId, '===', searchId);
+        return match;
+    });
+    
+    // If still not found, try matching by index
+    if (!patient && !isNaN(patientId) && patients[parseInt(patientId)]) {
+        console.log('Fallback: Using array index');
+        const indexPatient = patients[parseInt(patientId)];
+        if (indexPatient) {
+            showPatientModal(indexPatient);
+            return;
+        }
+    }
+    
+    if (!patient) {
+        console.error('Patient not found for ID:', patientId);
+        console.error('Available IDs:', patients.map(p => p.id || p._id || p.patientId || 'NO_ID'));
+        showNotification('Patient not found! Please refresh the page and try again.', 'danger');
+        return;
+    }
+    
+    console.log('Found patient:', patient);
+    showPatientModal(patient);
+}
+
+// Show patient details modal
+function showPatientModal(patient) {
+    
+    // Show patient details in a modal or alert
+    const details = `
+Patient Details
+
+ID: ${patient.id || patient._id || patient.patientId || 'N/A'}
+Name: ${patient.firstName || ''} ${patient.lastName || ''}
+Age: ${patient.age || 'N/A'}
+Gender: ${patient.gender || 'N/A'}
+Address: ${patient.address || 'N/A'}
+Phone: ${patient.phone || patient.contactNumber || 'N/A'}
+Last Visit: ${patient.lastVisit ? formatDate(patient.lastVisit) : 'N/A'}
+Status: ${patient.status || 'N/A'}
+Condition: ${patient.condition || 'N/A'}
+
+In the full application, this would open a detailed modal with:
+- Complete medical history
+- Vital signs chart
+- Lab results
+- Prescriptions
+- Appointment history
+    `.trim();
+    
+    alert(details);
 }
 
 // Edit supply
@@ -771,7 +1061,7 @@ function closeAddSupplyModal() {
     }
 }
 
-function saveNewSupply() {
+async function saveNewSupply() {
     const name = document.getElementById('supplyName').value.trim();
     const category = document.getElementById('supplyCategory').value;
     const quantity = parseInt(document.getElementById('supplyQuantity').value) || 0;
@@ -790,6 +1080,23 @@ function saveNewSupply() {
         category: category,
         status: quantity > reorderLevel ? 'adequate' : (quantity > 0 ? 'low' : 'critical')
     };
+    
+    // Save to API
+    if (USE_API && typeof api !== 'undefined') {
+        try {
+            const result = await api.createInventoryItem({
+                name: name,
+                category: category,
+                quantity: quantity,
+                reorderLevel: reorderLevel,
+                unit: 'pcs',
+                location: 'Primary Care Storage'
+            });
+            console.log('Supply saved to API:', result);
+        } catch (error) {
+            console.error('Error saving supply to API:', error);
+        }
+    }
     
     supplies.push(newSupply);
     localStorage.setItem('clinikabayan_supplies', JSON.stringify(supplies));

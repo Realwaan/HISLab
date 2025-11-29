@@ -2,49 +2,114 @@
 // DASHBOARD JAVASCRIPT
 // ============================================
 
+// API Configuration
+const API_URL = 'http://localhost:3000/api';
+const USE_API = false; // Set to false - only using MongoDB for login/signup
+
 // Data Storage
 let dashboardData = {
-    patients: JSON.parse(localStorage.getItem('clinikabayan_patients')) || [],
-    appointments: JSON.parse(localStorage.getItem('dashboard_appointments')) || [],
-    labRequests: JSON.parse(localStorage.getItem('dashboard_labRequests')) || [],
-    tasks: JSON.parse(localStorage.getItem('dashboard_tasks')) || [],
-    activities: JSON.parse(localStorage.getItem('dashboard_activities')) || []
+    patients: [],
+    appointments: [],
+    labRequests: [],
+    tasks: [],
+    activities: [],
+    stats: {}
 };
 
-// Initialize sample data
-function initializeSampleData() {
-    if (dashboardData.appointments.length === 0) {
-        dashboardData.appointments = [
-            { id: 1, patient: 'Maria Santos', time: '09:00 AM', type: 'Prenatal Checkup', status: 'pending' },
-            { id: 2, patient: 'Juan Reyes', time: '10:30 AM', type: 'Follow-up', status: 'confirmed' },
-            { id: 3, patient: 'Ana Lopez', time: '02:00 PM', type: 'Vaccination', status: 'pending' }
-        ];
-        localStorage.setItem('dashboard_appointments', JSON.stringify(dashboardData.appointments));
+// Load data from API or localStorage
+async function loadDataFromAPI() {
+    if (!USE_API) {
+        // Fallback to localStorage
+        dashboardData.patients = JSON.parse(localStorage.getItem('clinikabayan_patients')) || [];
+        dashboardData.appointments = JSON.parse(localStorage.getItem('dashboard_appointments')) || [];
+        dashboardData.tasks = JSON.parse(localStorage.getItem('dashboard_tasks')) || [];
+        return;
     }
     
-    if (dashboardData.labRequests.length === 0) {
-        dashboardData.labRequests = [
-            { id: 1, patient: 'Elena Cruz', test: 'Blood Sugar Test', status: 'pending', priority: 'high' },
-            { id: 2, patient: 'Roberto Flores', test: 'Complete Blood Count', status: 'processing', priority: 'medium' },
-            { id: 3, patient: 'Linda Gomez', test: 'Urinalysis', status: 'pending', priority: 'low' }
-        ];
-        localStorage.setItem('dashboard_labRequests', JSON.stringify(dashboardData.labRequests));
-    }
-    
-    if (dashboardData.tasks.length === 0) {
-        dashboardData.tasks = [
-            { id: 1, title: 'Review patient records', completed: false, priority: 'high', dueDate: new Date().toISOString() },
-            { id: 2, title: 'Update inventory list', completed: false, priority: 'medium', dueDate: new Date().toISOString() },
-            { id: 3, title: 'Submit monthly report', completed: true, priority: 'low', dueDate: new Date().toISOString() }
-        ];
-        localStorage.setItem('dashboard_tasks', JSON.stringify(dashboardData.tasks));
+    try {
+        console.log('Loading data from MongoDB...');
+        
+        // Load all data in parallel
+        const [patients, appointments, tasks, stats] = await Promise.all([
+            api.getPatients().catch(() => []),
+            api.getAppointments().catch(() => []),
+            api.getTasks().catch(() => []),
+            api.getStats().catch(() => ({}))
+        ]);
+        
+        dashboardData.patients = patients;
+        dashboardData.appointments = appointments;
+        dashboardData.tasks = tasks;
+        dashboardData.stats = stats;
+        
+        console.log('✅ Data loaded from MongoDB:', {
+            patients: patients.length,
+            appointments: appointments.length,
+            tasks: tasks.length
+        });
+        
+        // Also cache in localStorage as backup
+        localStorage.setItem('clinikabayan_patients', JSON.stringify(patients));
+        localStorage.setItem('dashboard_appointments', JSON.stringify(appointments));
+        localStorage.setItem('dashboard_tasks', JSON.stringify(tasks));
+        
+    } catch (error) {
+        console.error('Failed to load from API, using localStorage:', error);
+        dashboardData.patients = JSON.parse(localStorage.getItem('clinikabayan_patients')) || [];
+        dashboardData.appointments = JSON.parse(localStorage.getItem('dashboard_appointments')) || [];
+        dashboardData.tasks = JSON.parse(localStorage.getItem('dashboard_tasks')) || [];
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+// Initialize sample data (only if no data exists)
+async function initializeSampleData() {
+    // Check if we have data from API
+    if (dashboardData.appointments.length === 0 && dashboardData.tasks.length === 0) {
+        console.log('No data found, initializing sample data...');
+        
+        // Sample appointments
+        const sampleAppointments = [
+            { patientName: 'Maria Santos', time: '09:00 AM', type: 'Prenatal', date: new Date().toISOString().split('T')[0], status: 'Scheduled' },
+            { patientName: 'Juan Reyes', time: '10:30 AM', type: 'Follow-up', date: new Date().toISOString().split('T')[0], status: 'Confirmed' },
+            { patientName: 'Ana Lopez', time: '02:00 PM', type: 'Vaccination', date: new Date().toISOString().split('T')[0], status: 'Scheduled' }
+        ];
+        
+        // Sample tasks
+        const sampleTasks = [
+            { title: 'Review patient records', priority: 'High', status: 'Pending', dueDate: new Date().toISOString() },
+            { title: 'Update inventory list', priority: 'Medium', status: 'Pending', dueDate: new Date().toISOString() },
+            { title: 'Submit monthly report', priority: 'Low', status: 'Completed', dueDate: new Date().toISOString() }
+        ];
+        
+        if (USE_API) {
+            try {
+                // Save to MongoDB
+                for (const apt of sampleAppointments) {
+                    const saved = await api.createAppointment(apt);
+                    dashboardData.appointments.push(saved);
+                }
+                for (const task of sampleTasks) {
+                    const saved = await api.createTask(task);
+                    dashboardData.tasks.push(saved);
+                }
+                console.log('✅ Sample data saved to MongoDB');
+            } catch (error) {
+                console.error('Failed to save sample data:', error);
+            }
+        } else {
+            dashboardData.appointments = sampleAppointments;
+            dashboardData.tasks = sampleTasks;
+            localStorage.setItem('dashboard_appointments', JSON.stringify(dashboardData.appointments));
+            localStorage.setItem('dashboard_tasks', JSON.stringify(dashboardData.tasks));
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
     console.log('Dashboard initializing...');
     checkAuth();
-    initializeSampleData();
+    await loadDataFromAPI();
+    await initializeSampleData();
     initDashboard();
     setupEventListeners();
     createModals();
@@ -1051,93 +1116,141 @@ window.addEventListener('click', function(event) {
 // FORM SUBMISSION HANDLERS
 // ============================================
 
-function saveQuickPatient(event) {
+async function saveQuickPatient(event) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
     
-    const currentPatients = JSON.parse(localStorage.getItem('clinikabayan_patients')) || [];
-    let lastId = parseInt(localStorage.getItem('clinikabayan_lastPatientId') || '0');
-    lastId++;
-    
     const newPatient = {
-        id: `CK-${new Date().getFullYear()}-${String(lastId).padStart(3, '0')}`,
         firstName: formData.get('firstName'),
         lastName: formData.get('lastName'),
         age: parseInt(formData.get('age')),
         gender: formData.get('gender'),
         address: formData.get('address'),
         phone: formData.get('phone'),
-        lastVisit: new Date().toISOString().split('T')[0],
-        status: 'active',
         condition: formData.get('reason'),
-        registeredDate: new Date().toISOString()
+        status: 'active'
     };
     
-    currentPatients.push(newPatient);
-    dashboardData.patients = currentPatients;
-    localStorage.setItem('clinikabayan_patients', JSON.stringify(currentPatients));
-    localStorage.setItem('clinikabayan_lastPatientId', lastId);
-    
-    // Add activity
-    addActivity(`New patient registered: ${newPatient.firstName} ${newPatient.lastName}`, 'user-plus', 'success');
-    
-    form.reset();
-    closeModal('quickPatientModal');
-    updateDashboardStats();
-    showNotification(`Patient ${newPatient.firstName} ${newPatient.lastName} registered successfully! ID: ${newPatient.id}`, 'success');
+    try {
+        if (USE_API) {
+            showNotification('Registering patient...', 'info');
+            const saved = await api.createPatient(newPatient);
+            dashboardData.patients.push(saved);
+            console.log('✅ Patient saved to MongoDB:', saved);
+            
+            // Add activity
+            addActivity(`New patient registered: ${saved.firstName} ${saved.lastName}`, 'user-plus', 'success');
+            
+            form.reset();
+            closeModal('quickPatientModal');
+            updateDashboardStats();
+            showNotification(`Patient ${saved.firstName} ${saved.lastName} registered successfully! ID: ${saved.patientId}`, 'success');
+        } else {
+            // Fallback to localStorage
+            const currentPatients = JSON.parse(localStorage.getItem('clinikabayan_patients')) || [];
+            let lastId = parseInt(localStorage.getItem('clinikabayan_lastPatientId') || '0');
+            lastId++;
+            
+            newPatient.id = `CK-${new Date().getFullYear()}-${String(lastId).padStart(3, '0')}`;
+            newPatient.lastVisit = new Date().toISOString().split('T')[0];
+            newPatient.registeredDate = new Date().toISOString();
+            
+            currentPatients.push(newPatient);
+            dashboardData.patients = currentPatients;
+            localStorage.setItem('clinikabayan_patients', JSON.stringify(currentPatients));
+            localStorage.setItem('clinikabayan_lastPatientId', lastId);
+            
+            // Add activity
+            addActivity(`New patient registered: ${newPatient.firstName} ${newPatient.lastName}`, 'user-plus', 'success');
+            
+            form.reset();
+            closeModal('quickPatientModal');
+            updateDashboardStats();
+            showNotification(`Patient ${newPatient.firstName} ${newPatient.lastName} registered successfully! ID: ${newPatient.id}`, 'success');
+        }
+    } catch (error) {
+        console.error('Failed to register patient:', error);
+        showNotification('Failed to register patient: ' + error.message, 'error');
+    }
 }
 
-function saveAppointment(event) {
+async function saveAppointment(event) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
     
     const newAppointment = {
-        id: dashboardData.appointments.length + 1,
-        patient: formData.get('patient'),
+        patientName: formData.get('patient'),
         date: formData.get('date'),
         time: formData.get('time'),
         type: formData.get('type'),
         notes: formData.get('notes'),
-        status: 'pending',
-        created: new Date().toISOString()
+        status: 'Scheduled'
     };
     
-    dashboardData.appointments.push(newAppointment);
-    localStorage.setItem('dashboard_appointments', JSON.stringify(dashboardData.appointments));
-    
-    // Add activity
-    addActivity(`Appointment scheduled for ${newAppointment.patient}`, 'calendar-check', 'primary');
-    
-    form.reset();
-    closeModal('newAppointmentModal');
-    renderAppointments();
-    updateDashboardStats();
-    showNotification('Appointment scheduled successfully!', 'success');
+    try {
+        if (USE_API) {
+            showNotification('Saving appointment...', 'info');
+            const saved = await api.createAppointment(newAppointment);
+            dashboardData.appointments.push(saved);
+            console.log('✅ Appointment saved to MongoDB:', saved);
+        } else {
+            newAppointment.id = dashboardData.appointments.length + 1;
+            newAppointment.created = new Date().toISOString();
+            dashboardData.appointments.push(newAppointment);
+            localStorage.setItem('dashboard_appointments', JSON.stringify(dashboardData.appointments));
+        }
+        
+        // Add activity
+        addActivity(`Appointment scheduled for ${newAppointment.patientName}`, 'calendar-check', 'primary');
+        
+        form.reset();
+        closeModal('newAppointmentModal');
+        renderAppointments();
+        updateDashboardStats();
+        showNotification('Appointment scheduled successfully!', 'success');
+    } catch (error) {
+        console.error('Failed to save appointment:', error);
+        showNotification('Failed to save appointment: ' + error.message, 'error');
+    }
 }
 
-function saveTask(event) {
+async function saveTask(event) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
     
     const newTask = {
-        id: dashboardData.tasks.length + 1,
         title: formData.get('title'),
         priority: formData.get('priority'),
         dueDate: formData.get('dueDate'),
-        completed: false,
-        created: new Date().toISOString()
+        status: 'Pending',
+        description: formData.get('description') || ''
     };
     
-    dashboardData.tasks.push(newTask);
-    localStorage.setItem('dashboard_tasks', JSON.stringify(dashboardData.tasks));
-    
-    form.reset();
-    closeModal('newTaskModal');
-    renderTasks();
-    showNotification('Task added successfully!', 'success');
+    try {
+        if (USE_API) {
+            showNotification('Saving task...', 'info');
+            const saved = await api.createTask(newTask);
+            dashboardData.tasks.push(saved);
+            console.log('✅ Task saved to MongoDB:', saved);
+        } else {
+            newTask.id = dashboardData.tasks.length + 1;
+            newTask.completed = false;
+            newTask.created = new Date().toISOString();
+            dashboardData.tasks.push(newTask);
+            localStorage.setItem('dashboard_tasks', JSON.stringify(dashboardData.tasks));
+        }
+        
+        form.reset();
+        closeModal('newTaskModal');
+        renderTasks();
+        showNotification('Task added successfully!', 'success');
+    } catch (error) {
+        console.error('Failed to save task:', error);
+        showNotification('Failed to save task: ' + error.message, 'error');
+    }
 }
 
 function addActivity(description, icon, color) {
@@ -1435,4 +1548,30 @@ window.proceedToTransactions = proceedToTransactions;
 window.printLabRequest = printLabRequest;
 window.openLabRequest = openLabRequest;
 
+// Reset function to clear all patient data
+window.resetAllPatients = function() {
+    if (confirm('⚠️ This will DELETE all registered patients. Are you sure?')) {
+        localStorage.removeItem('clinikabayan_patients');
+        localStorage.removeItem('clinikabayan_lastPatientId');
+        alert('✅ All patients have been reset. Page will reload.');
+        location.reload();
+    }
+};
+
+// Reset all dashboard data
+window.resetAllData = function() {
+    if (confirm('⚠️ This will DELETE ALL data (patients, appointments, tasks). Are you sure?')) {
+        localStorage.removeItem('clinikabayan_patients');
+        localStorage.removeItem('clinikabayan_lastPatientId');
+        localStorage.removeItem('clinikabayan_appointments');
+        localStorage.removeItem('clinikabayan_tasks');
+        localStorage.removeItem('clinikabayan_supplies');
+        localStorage.removeItem('clinikabayan_volunteers');
+        alert('✅ All data has been reset. Page will reload.');
+        location.reload();
+    }
+};
+
 console.log('Dashboard functions exposed globally');
+console.log('💡 To reset patients, run: resetAllPatients()');
+console.log('💡 To reset all data, run: resetAllData()');

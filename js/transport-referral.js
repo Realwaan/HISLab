@@ -2,10 +2,50 @@
 // TRANSPORT & REFERRAL MODULE
 // ============================================
 
+// API Configuration
+const USE_API = false; // Set to false - only using MongoDB for login/signup
+
 // Data Storage
 let transportRequests = JSON.parse(localStorage.getItem('transportRequests') || '[]');
 let referrals = JSON.parse(localStorage.getItem('referrals') || '[]');
 let vehicles = JSON.parse(localStorage.getItem('vehicles') || '[]');
+
+// Load data from API
+async function loadTransportDataFromAPI() {
+    if (!USE_API || typeof api === 'undefined') return;
+    
+    try {
+        console.log('Loading Transport data from API...');
+        
+        // Load transport requests from API
+        const apiTransports = await api.getTransports();
+        if (apiTransports && apiTransports.length > 0) {
+            transportRequests = apiTransports.map(t => ({
+                id: t.requestId || t._id,
+                _id: t._id,
+                patientName: t.patientName,
+                age: t.age || 0,
+                gender: t.gender || 'Unknown',
+                from: t.pickupLocation || t.from,
+                to: t.destination || t.to,
+                reason: t.reason,
+                priority: t.priority || 'MEDIUM',
+                status: t.status || 'pending',
+                requested: t.requestedAt || t.createdAt,
+                driver: t.driver,
+                vehicle: t.vehicle
+            }));
+            console.log('Loaded', transportRequests.length, 'transport requests from API');
+        }
+        
+        // Update UI
+        renderRequests();
+        
+    } catch (error) {
+        console.error('Error loading transport data from API:', error);
+        // Fall back to localStorage
+    }
+}
 
 // Initialize default data if empty
 if (transportRequests.length === 0) {
@@ -98,6 +138,11 @@ document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
     initializePage();
     setupNewRequestButton();
+    
+    // Load data from API
+    if (USE_API && typeof api !== 'undefined') {
+        loadTransportDataFromAPI();
+    }
 });
 
 // Initialize page functionality
@@ -1049,7 +1094,7 @@ function createModals() {
 // NEW REQUEST
 // ============================================
 
-function submitNewRequest(event) {
+async function submitNewRequest(event) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
@@ -1069,6 +1114,28 @@ function submitNewRequest(event) {
         vehicle: null
     };
     
+    // Save to API
+    if (USE_API && typeof api !== 'undefined') {
+        try {
+            const apiData = {
+                requestId: newRequest.id,
+                patientName: newRequest.patientName,
+                age: newRequest.age,
+                gender: newRequest.gender,
+                pickupLocation: newRequest.from,
+                destination: newRequest.to,
+                reason: newRequest.reason,
+                priority: newRequest.priority,
+                status: 'pending',
+                requestedAt: newRequest.requested
+            };
+            const result = await api.createTransport(apiData);
+            console.log('Transport request saved to API:', result);
+        } catch (error) {
+            console.error('Error saving transport to API:', error);
+        }
+    }
+    
     transportRequests.push(newRequest);
     localStorage.setItem('transportRequests', JSON.stringify(transportRequests));
     
@@ -1078,7 +1145,7 @@ function submitNewRequest(event) {
     showNotification('Transport request created successfully!', 'success');
 }
 
-function submitNewReferral(event) {
+async function submitNewReferral(event) {
     event.preventDefault();
     const form = event.target;
     showNotification('Referral created successfully!', 'success');

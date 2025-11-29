@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Patient Click</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+        .btn-primary { background: #4CAF50; color: white; }
+        .btn-secondary { background: #2196F3; color: white; }
+        .btn-danger { background: #f44336; color: white; }
+        pre {
+            background: #263238;
+            color: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .patient-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #fafafa;
+        }
+        .patient-card:hover {
+            background: #e3f2fd;
+            border-color: #2196F3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 Patient Click Test Page</h1>
+        <p>This page tests the patient click functionality.</p>
+        
+        <h2>Step 1: Setup</h2>
+        <button class="btn-primary" onclick="setupAuth()">Set Up Authentication</button>
+        <button class="btn-danger" onclick="clearData()">Clear All Data</button>
+        <button class="btn-secondary" onclick="showCurrentData()">Show Current Data</button>
+        
+        <h2>Step 2: Test Patients</h2>
+        <div id="patientsContainer"></div>
+        
+        <h2>Console Output</h2>
+        <pre id="output">Click buttons to see output...</pre>
+        
+        <div id="result" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            output.textContent += '\n[LOG] ' + args.map(a => 
+                typeof a === 'object' ? JSON.stringify(a, null, 2) : a
+            ).join(' ');
+            output.scrollTop = output.scrollHeight;
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            output.textContent += '\n[ERROR] ' + args.map(a => 
+                typeof a === 'object' ? JSON.stringify(a, null, 2) : a
+            ).join(' ');
+            output.scrollTop = output.scrollHeight;
+        };
+        
+        function setupAuth() {
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('userData', JSON.stringify({ 
+                name: 'Test User', 
+                email: 'test@example.com' 
+            }));
+            console.log('✅ Authentication set up successfully');
+        }
+        
+        function clearData() {
+            localStorage.removeItem('clinikabayan_patients');
+            localStorage.removeItem('clinikabayan_lastPatientId');
+            console.log('✅ Patient data cleared');
+            loadPatients();
+        }
+        
+        function showCurrentData() {
+            const patients = localStorage.getItem('clinikabayan_patients');
+            if (patients) {
+                const parsed = JSON.parse(patients);
+                console.log('Current patients in localStorage:', parsed.length);
+                parsed.forEach((p, i) => {
+                    console.log(`[${i}] ID: ${p.id || p._id || 'NO ID'}, Name: ${p.firstName} ${p.lastName}`);
+                });
+            } else {
+                console.log('No patients in localStorage');
+            }
+        }
+        
+        function loadPatients() {
+            const container = document.getElementById('patientsContainer');
+            const stored = localStorage.getItem('clinikabayan_patients');
+            
+            if (!stored) {
+                // Create sample patients
+                const samplePatients = [
+                    { id: 'CK-2025-001', firstName: 'Maria', lastName: 'Santos', age: 34, status: 'active' },
+                    { id: 'CK-2025-002', firstName: 'Juan', lastName: 'Reyes', age: 56, status: 'ongoing' },
+                    { id: 'CK-2025-003', firstName: 'Ana', lastName: 'Lopez', age: 12, status: 'active' }
+                ];
+                localStorage.setItem('clinikabayan_patients', JSON.stringify(samplePatients));
+                console.log('✅ Created sample patients');
+            }
+            
+            const patients = JSON.parse(localStorage.getItem('clinikabayan_patients') || '[]');
+            
+            container.innerHTML = patients.map(p => {
+                const patientId = p.id || p._id || p.patientId || 'unknown';
+                return `
+                    <div class="patient-card" onclick="testClickPatient('${patientId}')">
+                        <strong>${p.firstName} ${p.lastName}</strong><br>
+                        <small>ID: ${patientId} | Age: ${p.age || 'N/A'} | Status: ${p.status || 'active'}</small>
+                    </div>
+                `;
+            }).join('');
+            
+            if (patients.length === 0) {
+                container.innerHTML = '<p>No patients. Click "Clear All Data" to reset with sample data.</p>';
+            }
+        }
+        
+        function testClickPatient(patientId) {
+            console.log('\n=== Testing Patient Click ===');
+            console.log('Clicked patient ID:', patientId);
+            
+            const patients = JSON.parse(localStorage.getItem('clinikabayan_patients') || '[]');
+            console.log('Patients in storage:', patients.length);
+            
+            const patient = patients.find(p => {
+                const pId = String(p.id || p._id || p.patientId || '');
+                const searchId = String(patientId);
+                return pId === searchId;
+            });
+            
+            if (patient) {
+                console.log('✅ Patient FOUND:', patient);
+                document.getElementById('result').style.display = 'block';
+                document.getElementById('result').innerHTML = `
+                    <h3>✅ Patient Found!</h3>
+                    <p><strong>ID:</strong> ${patient.id}</p>
+                    <p><strong>Name:</strong> ${patient.firstName} ${patient.lastName}</p>
+                    <p><strong>Age:</strong> ${patient.age}</p>
+                    <p><strong>Status:</strong> ${patient.status}</p>
+                `;
+            } else {
+                console.error('❌ Patient NOT FOUND for ID:', patientId);
+                console.log('Available IDs:', patients.map(p => p.id || p._id || p.patientId));
+                document.getElementById('result').style.display = 'block';
+                document.getElementById('result').innerHTML = `
+                    <h3 style="color: red;">❌ Patient Not Found!</h3>
+                    <p>Searched for ID: ${patientId}</p>
+                    <p>Available IDs: ${patients.map(p => p.id || 'NO_ID').join(', ')}</p>
+                `;
+            }
+        }
+        
+        // Initial load
+        loadPatients();
+    </script>
+</body>
+</html>

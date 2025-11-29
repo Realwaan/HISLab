@@ -2,8 +2,99 @@
 // LOGIN PAGE JAVASCRIPT
 // ============================================
 
+// API Configuration
+const API_BASE_URL = 'http://localhost:3000/api';
+const USE_MONGODB_API = true; // Set to true to use MongoDB API for auth
+
 // ============================================
-// SECURE DATABASE STORAGE
+// MONGODB API AUTHENTICATION
+// ============================================
+
+async function apiLogin(email, password) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                username: email, // API uses username field
+                password: password 
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                return { error: 'WRONG_PASSWORD' };
+            }
+            if (response.status === 404 || result.error?.includes('not found')) {
+                return { error: 'USER_NOT_FOUND' };
+            }
+            return { error: result.error || 'LOGIN_FAILED' };
+        }
+        
+        // Store token if returned
+        if (result.token) {
+            localStorage.setItem('authToken', result.token);
+        }
+        
+        return { 
+            success: true, 
+            user: result.user || {
+                email: email,
+                fullname: result.user?.firstName + ' ' + result.user?.lastName || email,
+                role: result.user?.role || 'Staff'
+            }
+        };
+    } catch (error) {
+        console.error('API Login error:', error);
+        // If API is not available, return error to fallback
+        return { error: 'API_UNAVAILABLE' };
+    }
+}
+
+async function apiRegister(fullname, email, role, password) {
+    try {
+        // Split fullname into first and last name
+        const nameParts = fullname.trim().split(' ');
+        const firstName = nameParts[0] || fullname;
+        const lastName = nameParts.slice(1).join(' ') || '';
+        
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: email,
+                email: email,
+                password: password,
+                firstName: firstName,
+                lastName: lastName,
+                role: role
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            if (result.error?.includes('already exists') || result.error?.includes('duplicate')) {
+                return { error: 'EMAIL_EXISTS' };
+            }
+            return { error: result.error || 'REGISTRATION_FAILED' };
+        }
+        
+        return { success: true, user: result };
+    } catch (error) {
+        console.error('API Registration error:', error);
+        return { error: 'API_UNAVAILABLE' };
+    }
+}
+
+// ============================================
+// SECURE DATABASE STORAGE (localStorage fallback)
 // ============================================
 
 // Simple encryption function (for demonstration - in production use proper backend encryption)
@@ -224,18 +315,33 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.textContent = 'Signing in...';
         submitBtn.disabled = true;
 
-        // Validate credentials against database (Firebase or localStorage)
+        // Validate credentials against database (MongoDB API, Firebase, or localStorage)
         setTimeout(async () => {
             try {
                 let result;
                 
-                // Try Firebase first
-                if (window.FirebaseAuth && window.FirebaseAuth.isAvailable()) {
+                // Try MongoDB API first
+                if (USE_MONGODB_API) {
+                    console.log('Using MongoDB API for login');
+                    result = await apiLogin(email, password);
+                    
+                    // If API is unavailable, try other methods
+                    if (result.error === 'API_UNAVAILABLE') {
+                        console.log('MongoDB API unavailable, trying Firebase...');
+                        if (window.FirebaseAuth && window.FirebaseAuth.isAvailable()) {
+                            result = await window.FirebaseAuth.login(email, password);
+                        } else {
+                            console.log('Firebase not available, using localStorage');
+                            result = validateCredentials(email, password);
+                        }
+                    }
+                } else if (window.FirebaseAuth && window.FirebaseAuth.isAvailable()) {
+                    // Try Firebase
                     console.log('Using Firebase for login');
                     result = await window.FirebaseAuth.login(email, password);
                 } else {
                     // Fallback to localStorage
-                    console.log('Firebase not available, using localStorage');
+                    console.log('Using localStorage for login');
                     result = validateCredentials(email, password);
                 }
                 
@@ -358,13 +464,42 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.textContent = 'Creating account...';
         submitBtn.disabled = true;
 
-        // Save to database (Firebase or localStorage)
+        // Save to database (MongoDB API, Firebase, or localStorage)
         setTimeout(async () => {
             try {
                 let success = false;
+                let errorMessage = '';
                 
-                // Try Firebase first
-                if (window.FirebaseAuth && window.FirebaseAuth.isAvailable()) {
+                // Try MongoDB API first
+                if (USE_MONGODB_API) {
+                    console.log('Using MongoDB API for registration');
+                    const result = await apiRegister(fullname, email, role, password);
+                    
+                    if (result.success) {
+                        success = true;
+                        console.log('User registered successfully to MongoDB');
+                    } else if (result.error === 'API_UNAVAILABLE') {
+                        // Try Firebase if API is unavailable
+                        console.log('MongoDB API unavailable, trying Firebase...');
+                        if (window.FirebaseAuth && window.FirebaseAuth.isAvailable()) {
+                            const fbResult = await window.FirebaseAuth.register(fullname, email, role, password);
+                            if (fbResult.success) {
+                                success = true;
+                            } else {
+                                errorMessage = fbResult.error || 'Registration failed';
+                            }
+                        } else {
+                            // Fallback to localStorage
+                            console.log('Firebase not available, using localStorage');
+                            success = saveUser({ fullname, email, role, password });
+                        }
+                    } else if (result.error === 'EMAIL_EXISTS') {
+                        errorMessage = 'An account with this email already exists.';
+                    } else {
+                        errorMessage = result.error || 'Registration failed';
+                    }
+                } else if (window.FirebaseAuth && window.FirebaseAuth.isAvailable()) {
+                    // Try Firebase first
                     console.log('Using Firebase for registration');
                     const result = await window.FirebaseAuth.register(fullname, email, role, password);
                     
@@ -372,11 +507,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         success = true;
                         console.log('User registered successfully to Firebase');
                     } else {
-                        throw new Error(result.error);
+                        errorMessage = result.error || 'Registration failed';
                     }
                 } else {
                     // Fallback to localStorage
-                    console.log('Firebase not available, using localStorage');
+                    console.log('Using localStorage for registration');
                     success = saveUser({
                         fullname: fullname,
                         email: email,
@@ -400,7 +535,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     submitBtn.textContent = 'Create Account';
                     submitBtn.disabled = false;
                 } else {
-                    throw new Error('Failed to save user');
+                    throw new Error(errorMessage || 'Failed to create account');
                 }
             } catch (error) {
                 alert('Registration failed: ' + error.message);
