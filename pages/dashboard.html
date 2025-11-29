@@ -168,15 +168,15 @@
                 <h3 class="section-title">Key Performance Indicators</h3>
                 <div class="kpi-grid">
                     <!-- Total Patients -->
-                    <div class="kpi-card">
+                    <div class="kpi-card clickable" onclick="openModal('patientsListModal')" style="cursor: pointer;">
                         <div class="kpi-icon primary">
                             <i class="fas fa-user-injured"></i>
                         </div>
                         <div class="kpi-content">
                             <p class="kpi-label">Total Patients</p>
-                            <h3 class="kpi-value">2,847</h3>
-                            <p class="kpi-change positive">
-                                <i class="fas fa-arrow-up"></i> 12% from last month
+                            <h3 class="kpi-value">0</h3>
+                            <p class="kpi-change">
+                                <i class="fas fa-list"></i> Click to view all patients
                             </p>
                         </div>
                     </div>
@@ -267,6 +267,39 @@
                         <h4>Health Education Campaigns</h4>
                         <p>Plan and track community health awareness programs</p>
                     </a>
+                </div>
+            </div>
+
+            <!-- Appointments & Tasks Section -->
+            <div class="appointments-tasks-section">
+                <div class="appointments-panel">
+                    <div class="panel-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-calendar-alt"></i> Today's Appointments
+                        </h3>
+                        <button class="btn btn-sm btn-primary" onclick="scheduleAppointment()">
+                            <i class="fas fa-plus"></i> Schedule
+                        </button>
+                    </div>
+                    <div class="appointments-list">
+                        <!-- Appointments will be dynamically rendered here -->
+                        <p style="text-align: center; padding: 20px; color: #666;">Loading appointments...</p>
+                    </div>
+                </div>
+
+                <div class="tasks-panel">
+                    <div class="panel-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-tasks"></i> My Tasks
+                        </h3>
+                        <button class="btn btn-sm btn-accent" onclick="addTask()">
+                            <i class="fas fa-plus"></i> Add Task
+                        </button>
+                    </div>
+                    <div class="tasks-list">
+                        <!-- Tasks will be dynamically rendered here -->
+                        <p style="text-align: center; padding: 20px; color: #666;">Loading tasks...</p>
+                    </div>
                 </div>
             </div>
 

@@ -131,27 +131,51 @@ function setupNewRequestButton() {
 // TAB FUNCTIONALITY
 // ============================================
 
+// Global function for switching tabs - called by onclick
+function switchTransportTab(tabName) {
+    // Remove active from all buttons
+    var buttons = document.querySelectorAll('.transport-tab-btn');
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove('active');
+    }
+    
+    // Remove active from all tab contents
+    var contents = document.querySelectorAll('.transport-tab-content');
+    for (var j = 0; j < contents.length; j++) {
+        contents[j].classList.remove('active');
+    }
+    
+    // Activate the clicked button based on tabName
+    for (var k = 0; k < buttons.length; k++) {
+        var btn = buttons[k];
+        var onclickStr = btn.getAttribute('onclick') || '';
+        if (onclickStr.indexOf(tabName) !== -1) {
+            btn.classList.add('active');
+        }
+    }
+    
+    // Show corresponding tab content
+    var tabContent = document.getElementById(tabName + '-tab');
+    if (tabContent) {
+        tabContent.classList.add('active');
+        
+        // Trigger rendering for specific tabs
+        if (tabName === 'referrals' && typeof renderReferrals === 'function') {
+            renderReferrals();
+        } else if (tabName === 'vehicles' && typeof renderVehicles === 'function') {
+            renderVehicles();
+        } else if (tabName === 'history' && typeof renderHistory === 'function') {
+            renderHistory();
+        }
+    }
+}
+
+// Make function globally accessible
+window.switchTransportTab = switchTransportTab;
+
+// Setup Tabs (keeping for backward compatibility)
 function setupTabs() {
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Remove active class from all buttons and contents
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabContents.forEach(content => content.classList.remove('active'));
-
-            // Add active class to clicked button
-            button.classList.add('active');
-
-            // Show corresponding tab content
-            const tabName = button.getAttribute('data-tab');
-            const tabContent = document.getElementById(tabName + 'Tab');
-            if (tabContent) {
-                tabContent.classList.add('active');
-            }
-        });
-    });
+    console.log('Transport tabs initialized');
 }
 
 // ============================================
@@ -720,6 +744,79 @@ function getVehicleActions(vehicle) {
             </button>
         `;
     }
+}
+
+// Render Referrals
+function renderReferrals() {
+    console.log('Rendering referrals...');
+    const tbody = document.querySelector('#referralsTab tbody');
+    if (!tbody) {
+        console.error('Referrals table body not found');
+        return;
+    }
+    
+    if (referrals.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">No referrals found. Click "Create Referral" to add one.</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = referrals.map(ref => `
+        <tr>
+            <td><strong>${ref.id}</strong></td>
+            <td>${ref.patientName}</td>
+            <td>${ref.fromFacility}</td>
+            <td>${ref.toHospital}</td>
+            <td>${ref.specialty}</td>
+            <td><span class="priority-${ref.priority.toLowerCase()}">${ref.priority}</span></td>
+            <td><span class="status-badge status-${ref.status}">${formatStatus(ref.status)}</span></td>
+            <td>
+                <button class="btn-icon" onclick="editReferral('${ref.id}')" title="Edit">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-icon" onclick="printReferral('${ref.id}')" title="Print">
+                    <i class="fas fa-print"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+    
+    console.log('Referrals rendered:', referrals.length);
+}
+
+// Render History
+function renderHistory() {
+    console.log('Rendering history...');
+    const tbody = document.querySelector('#historyTab tbody');
+    if (!tbody) {
+        console.error('History table body not found');
+        return;
+    }
+    
+    // Get completed requests
+    const completed = transportRequests.filter(req => req.status === 'completed');
+    
+    if (completed.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No completed requests yet.</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = completed.map(req => `
+        <tr>
+            <td><strong>${req.id}</strong></td>
+            <td>${req.patientName}</td>
+            <td>${req.from}</td>
+            <td>${req.to}</td>
+            <td>${req.driver || 'N/A'}</td>
+            <td>${formatDate(req.completed || req.requested)}</td>
+            <td>
+                <button class="btn-icon" onclick="viewDetails('${req.id}')" title="View Details">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+    
+    console.log('History rendered:', completed.length, 'completed requests');
 }
 
 // ============================================

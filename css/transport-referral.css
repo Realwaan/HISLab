@@ -253,46 +253,112 @@
 /* Tabs Container */
 .tabs-container {
     display: flex;
-    gap: var(--spacing-xs);
+    gap: 4px;
     margin-bottom: var(--spacing-lg);
-    border-bottom: 2px solid var(--border-color);
+    background: #F5F7FA;
+    border-radius: 12px;
+    padding: 6px;
     overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #2196F3 #E9ECEF;
 }
 
-.tab-btn {
-    padding: var(--spacing-md) var(--spacing-lg);
+.tabs-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.tabs-container::-webkit-scrollbar-track {
+    background: #E9ECEF;
+    border-radius: 10px;
+}
+
+.tabs-container::-webkit-scrollbar-thumb {
+    background: #2196F3;
+    border-radius: 10px;
+}
+
+.tabs-container::-webkit-scrollbar-thumb:hover {
+    background: #1976D2;
+}
+
+.tab-btn,
+.transport-tab-btn {
+    padding: 12px 20px;
     background: transparent;
     border: none;
-    border-bottom: 3px solid transparent;
-    color: var(--text-secondary);
+    border-radius: 8px;
+    color: #6C757D;
     font-weight: 600;
+    font-size: 13px;
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.tab-btn:hover {
-    color: var(--primary-color);
-    background: var(--background);
+.tab-btn:hover,
+.transport-tab-btn:hover {
+    color: #495057;
+    background: rgba(33, 150, 243, 0.1);
 }
 
-.tab-btn.active {
-    color: var(--primary-color);
-    border-bottom-color: var(--primary-color);
+.tab-btn.active,
+.transport-tab-btn.active {
+    color: white;
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
 }
 
-.tab-btn i {
-    margin-right: var(--spacing-xs);
+.tab-btn i,
+.transport-tab-btn i {
+    font-size: 14px;
+}
+
+/* Transport Tabs Wrapper - Parent Container */
+.transport-tabs-wrapper {
+    background: #FAFBFC;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Tab Contents Container - Child Container */
+.transport-tab-contents {
+    margin-top: 20px;
+    overflow: visible;
 }
 
 /* Tab Content */
+.transport-tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.transport-tab-content.active {
+    display: block;
+}
+
+/* Legacy support */
 .tab-content {
     display: none;
+    animation: fadeIn 0.3s ease;
 }
 
 .tab-content.active {
     display: block;
-    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
 }
 
 /* Content Header */

@@ -2,15 +2,56 @@
 // DASHBOARD JAVASCRIPT
 // ============================================
 
+// Data Storage
+let dashboardData = {
+    patients: JSON.parse(localStorage.getItem('clinikabayan_patients')) || [],
+    appointments: JSON.parse(localStorage.getItem('dashboard_appointments')) || [],
+    labRequests: JSON.parse(localStorage.getItem('dashboard_labRequests')) || [],
+    tasks: JSON.parse(localStorage.getItem('dashboard_tasks')) || [],
+    activities: JSON.parse(localStorage.getItem('dashboard_activities')) || []
+};
+
+// Initialize sample data
+function initializeSampleData() {
+    if (dashboardData.appointments.length === 0) {
+        dashboardData.appointments = [
+            { id: 1, patient: 'Maria Santos', time: '09:00 AM', type: 'Prenatal Checkup', status: 'pending' },
+            { id: 2, patient: 'Juan Reyes', time: '10:30 AM', type: 'Follow-up', status: 'confirmed' },
+            { id: 3, patient: 'Ana Lopez', time: '02:00 PM', type: 'Vaccination', status: 'pending' }
+        ];
+        localStorage.setItem('dashboard_appointments', JSON.stringify(dashboardData.appointments));
+    }
+    
+    if (dashboardData.labRequests.length === 0) {
+        dashboardData.labRequests = [
+            { id: 1, patient: 'Elena Cruz', test: 'Blood Sugar Test', status: 'pending', priority: 'high' },
+            { id: 2, patient: 'Roberto Flores', test: 'Complete Blood Count', status: 'processing', priority: 'medium' },
+            { id: 3, patient: 'Linda Gomez', test: 'Urinalysis', status: 'pending', priority: 'low' }
+        ];
+        localStorage.setItem('dashboard_labRequests', JSON.stringify(dashboardData.labRequests));
+    }
+    
+    if (dashboardData.tasks.length === 0) {
+        dashboardData.tasks = [
+            { id: 1, title: 'Review patient records', completed: false, priority: 'high', dueDate: new Date().toISOString() },
+            { id: 2, title: 'Update inventory list', completed: false, priority: 'medium', dueDate: new Date().toISOString() },
+            { id: 3, title: 'Submit monthly report', completed: true, priority: 'low', dueDate: new Date().toISOString() }
+        ];
+        localStorage.setItem('dashboard_tasks', JSON.stringify(dashboardData.tasks));
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if user is logged in
+    console.log('Dashboard initializing...');
     checkAuth();
-    
-    // Initialize dashboard
+    initializeSampleData();
     initDashboard();
-    
-    // Setup event listeners
     setupEventListeners();
+    createModals();
+    updateDashboardStats();
+    renderAppointments();
+    renderTasks();
+    console.log('Dashboard initialized successfully');
 });
 
 // Check authentication
@@ -68,13 +109,27 @@ function markAllAsRead() {
     showNotification('All notifications marked as read', 'success');
 }
 
-// Logout function
+// Initialize dashboard
 function initDashboard() {
-    // Set current date
     setCurrentDate();
-    
-    // Load dashboard data (in real app, this would be from API)
     loadDashboardData();
+    updateClock();
+    setInterval(updateClock, 1000);
+}
+
+function updateClock() {
+    const clockElement = document.querySelector('.ph-time');
+    if (clockElement) {
+        const now = new Date();
+        const options = { 
+            timeZone: 'Asia/Manila',
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true 
+        };
+        clockElement.textContent = now.toLocaleTimeString('en-US', options);
+    }
 }
 
 // Set current date
@@ -504,8 +559,863 @@ function updateWeather() {
 setInterval(updateQuickStats, 30000); // Update every 30 seconds
 setInterval(updateWeather, 60000); // Update every minute
 
-// Export functions for use in other modules
+// ============================================
+// RENDER FUNCTIONS
+// ============================================
+
+function updateDashboardStats() {
+    // Update KPI cards
+    const totalPatients = dashboardData.patients.length;
+    const todayAppointments = dashboardData.appointments.filter(a => a.status !== 'completed').length;
+    const pendingLabs = dashboardData.labRequests.filter(l => l.status === 'pending').length;
+    const completedToday = dashboardData.appointments.filter(a => a.status === 'completed').length;
+    
+    // Update stat values if elements exist
+    document.querySelectorAll('.kpi-value').forEach((el, index) => {
+        const values = [totalPatients, todayAppointments, pendingLabs, completedToday];
+        if (values[index]) el.textContent = values[index];
+    });
+}
+
+function renderAppointments() {
+    const appointmentsList = document.querySelector('.appointments-list');
+    if (!appointmentsList) return;
+    
+    if (dashboardData.appointments.length === 0) {
+        appointmentsList.innerHTML = '<p style="text-align: center; padding: 20px; color: #666;">No appointments scheduled</p>';
+        return;
+    }
+    
+    appointmentsList.innerHTML = dashboardData.appointments.map(apt => {
+        // Find patient ID by name
+        const patient = dashboardData.patients.find(p => 
+            `${p.firstName} ${p.lastName}` === apt.patient
+        );
+        const patientId = patient ? patient.id : null;
+        
+        return `
+            <div class="appointment-item ${apt.status}">
+                <div class="appointment-time">
+                    <i class="fas fa-clock"></i>
+                    <span>${apt.time}</span>
+                </div>
+                <div class="appointment-details">
+                    <h5 class="${patientId ? 'clickable-patient' : ''}" ${patientId ? `onclick="viewPatientDetails('${patientId}')" style="cursor: pointer; color: var(--primary-color);"` : ''}>
+                        ${apt.patient}
+                        ${patientId ? '<i class="fas fa-external-link-alt" style="font-size: 11px; margin-left: 4px;"></i>' : ''}
+                    </h5>
+                    <p>${apt.type}</p>
+                </div>
+                <span class="appointment-status status-${apt.status}">${apt.status}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderTasks() {
+    const tasksList = document.querySelector('.tasks-list');
+    if (!tasksList) return;
+    
+    tasksList.innerHTML = dashboardData.tasks.map(task => `
+        <div class="task-item ${task.completed ? 'completed' : ''} priority-${task.priority}">
+            <div class="task-checkbox">
+                <input type="checkbox" id="task${task.id}" ${task.completed ? 'checked' : ''} 
+                    onclick="toggleTaskCompletion(${task.id})">
+                <label for="task${task.id}"></label>
+            </div>
+            <div class="task-content">
+                <p class="task-title">${task.title}</p>
+                <p class="task-time"><i class="fas fa-clock"></i> ${formatTaskDate(task.dueDate)}</p>
+            </div>
+        </div>
+    `).join('');
+}
+
+function formatTaskDate(dateString) {
+    const date = new Date(dateString);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    if (date.toDateString() === today.toDateString()) return 'Today';
+    if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function toggleTaskCompletion(taskId) {
+    const task = dashboardData.tasks.find(t => t.id === taskId);
+    if (task) {
+        task.completed = !task.completed;
+        localStorage.setItem('dashboard_tasks', JSON.stringify(dashboardData.tasks));
+        renderTasks();
+        showNotification(task.completed ? 'Task completed!' : 'Task reopened', 'success');
+    }
+}
+
+// ============================================
+// MODAL FUNCTIONS
+// ============================================
+
+function createModals() {
+    const modalsHTML = `
+        <!-- Quick Patient Registration Modal -->
+        <div id="quickPatientModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-user-plus"></i> Quick Patient Registration</h2>
+                    <button class="btn-close" onclick="closeModal('quickPatientModal')">&times;</button>
+                </div>
+                <form id="quickPatientForm" onsubmit="saveQuickPatient(event)">
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>First Name *</label>
+                                <input type="text" name="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name *</label>
+                                <input type="text" name="lastName" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Age *</label>
+                                <input type="number" name="age" required min="0" max="150">
+                            </div>
+                            <div class="form-group">
+                                <label>Gender *</label>
+                                <select name="gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Number</label>
+                            <input type="tel" name="phone" placeholder="+63">
+                        </div>
+                        <div class="form-group">
+                            <label>Address *</label>
+                            <input type="text" name="address" required placeholder="Barangay, City">
+                        </div>
+                        <div class="form-group">
+                            <label>Reason for Visit *</label>
+                            <textarea name="reason" required rows="3" placeholder="Brief description of symptoms or reason"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('quickPatientModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Register Patient
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- New Appointment Modal -->
+        <div id="newAppointmentModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-calendar-plus"></i> Schedule Medical Appointment</h2>
+                    <button class="btn-close" onclick="closeModal('newAppointmentModal')">&times;</button>
+                </div>
+                <form id="appointmentForm" onsubmit="saveAppointment(event)">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Patient Name</label>
+                            <input type="text" name="patient" required list="patientList" placeholder="Select or type patient name">
+                            <datalist id="patientList">
+                                ${dashboardData.patients.map(p => `<option value="${p.firstName} ${p.lastName}">`).join('')}
+                            </datalist>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date</label>
+                                <input type="date" name="date" required min="${new Date().toISOString().split('T')[0]}">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-clock"></i> Time</label>
+                                <input type="time" name="time" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-stethoscope"></i> Appointment Type</label>
+                            <select name="type" required>
+                                <option value="">Select appointment type...</option>
+                                <option value="General Checkup">🩺 General Checkup</option>
+                                <option value="Follow-up">📋 Follow-up Visit</option>
+                                <option value="Prenatal Care">🤰 Prenatal Care</option>
+                                <option value="Vaccination">💉 Vaccination</option>
+                                <option value="Consultation">💬 Consultation</option>
+                                <option value="Laboratory">🔬 Laboratory Tests</option>
+                                <option value="Emergency">🚨 Emergency Care</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-notes-medical"></i> Additional Notes</label>
+                            <textarea name="notes" rows="3" placeholder="Enter any special instructions, symptoms, or additional information..."></textarea>
+                        </div>
+                        <div class="info-badge">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Please arrive 15 minutes before your scheduled appointment time.</span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('newAppointmentModal')">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-calendar-check"></i> Schedule Appointment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Patients List Modal -->
+        <div id="patientsListModal" class="modal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2><i class="fas fa-users"></i> All Registered Patients</h2>
+                    <button class="btn-close" onclick="closeModal('patientsListModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="search-filter-bar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="patientSearch" placeholder="Search by name, ID, or address..." onkeyup="filterPatientsList()">
+                        </div>
+                        <button class="btn btn-primary" onclick="closeModal('patientsListModal'); quickRegisterPatient();">
+                            <i class="fas fa-user-plus"></i> Add New Patient
+                        </button>
+                    </div>
+                    <div id="patientsListContainer" class="patients-grid">
+                        <!-- Patients will be rendered here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('patientsListModal')">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Details Modal with Tabs -->
+        <div id="patientDetailsModal" class="modal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2><i class="fas fa-user-circle"></i> Patient Information</h2>
+                    <button class="btn-close" onclick="closeModal('patientDetailsModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="patient-tabs">
+                        <button class="patient-tab-btn active" onclick="switchPatientTab('demographics')">
+                            <i class="fas fa-id-card"></i> Demographics
+                        </button>
+                        <button class="patient-tab-btn" onclick="switchPatientTab('medical')">
+                            <i class="fas fa-heartbeat"></i> Medical History
+                        </button>
+                        <button class="patient-tab-btn" onclick="switchPatientTab('appointments')">
+                            <i class="fas fa-calendar-check"></i> Appointments
+                        </button>
+                        <button class="patient-tab-btn" onclick="switchPatientTab('vitals')">
+                            <i class="fas fa-stethoscope"></i> Vital Signs
+                        </button>
+                        <button class="patient-tab-btn" onclick="switchPatientTab('billing')">
+                            <i class="fas fa-file-invoice-dollar"></i> Billing
+                        </button>
+                    </div>
+                    
+                    <!-- Demographics Tab -->
+                    <div id="demographics-tab" class="patient-tab-content active">
+                        <div class="patient-info-grid">
+                            <div class="info-card">
+                                <label>Patient ID</label>
+                                <p id="modal-patient-id">-</p>
+                            </div>
+                            <div class="info-card">
+                                <label>Full Name</label>
+                                <p id="modal-patient-name">-</p>
+                            </div>
+                            <div class="info-card">
+                                <label>Age</label>
+                                <p id="modal-patient-age">-</p>
+                            </div>
+                            <div class="info-card">
+                                <label>Gender</label>
+                                <p id="modal-patient-gender">-</p>
+                            </div>
+                            <div class="info-card">
+                                <label>Date of Birth</label>
+                                <p id="modal-patient-dob">-</p>
+                            </div>
+                            <div class="info-card">
+                                <label>Blood Type</label>
+                                <p id="modal-patient-blood">Not specified</p>
+                            </div>
+                            <div class="info-card full-width">
+                                <label>Address</label>
+                                <p id="modal-patient-address">-</p>
+                            </div>
+                            <div class="info-card">
+                                <label>Contact Number</label>
+                                <p id="modal-patient-phone">-</p>
+                            </div>
+                            <div class="info-card">
+                                <label>Emergency Contact</label>
+                                <p id="modal-patient-emergency">Not specified</p>
+                            </div>
+                            <div class="info-card full-width">
+                                <label>Registration Date</label>
+                                <p id="modal-patient-registered">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Medical History Tab -->
+                    <div id="medical-tab" class="patient-tab-content">
+                        <div class="medical-records">
+                            <h4><i class="fas fa-clipboard-list"></i> Medical Conditions</h4>
+                            <div id="medical-conditions" class="records-list">
+                                <p class="no-data">No medical conditions recorded</p>
+                            </div>
+                            
+                            <h4><i class="fas fa-pills"></i> Current Medications</h4>
+                            <div id="current-medications" class="records-list">
+                                <p class="no-data">No current medications</p>
+                            </div>
+                            
+                            <h4><i class="fas fa-allergies"></i> Allergies</h4>
+                            <div id="patient-allergies" class="records-list">
+                                <p class="no-data">No known allergies</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Appointments Tab -->
+                    <div id="appointments-tab" class="patient-tab-content">
+                        <div class="appointments-history">
+                            <h4><i class="fas fa-calendar-alt"></i> Appointment History</h4>
+                            <div id="patient-appointments-list" class="records-list">
+                                <p class="no-data">No appointments scheduled</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Vital Signs Tab -->
+                    <div id="vitals-tab" class="patient-tab-content">
+                        <div class="vitals-records">
+                            <h4><i class="fas fa-heartbeat"></i> Recent Vital Signs</h4>
+                            <div id="patient-vitals" class="vitals-grid">
+                                <div class="vital-card">
+                                    <i class="fas fa-thermometer-half"></i>
+                                    <label>Temperature</label>
+                                    <p class="vital-value">36.5°C</p>
+                                    <span class="vital-status normal">Normal</span>
+                                </div>
+                                <div class="vital-card">
+                                    <i class="fas fa-heartbeat"></i>
+                                    <label>Blood Pressure</label>
+                                    <p class="vital-value">120/80</p>
+                                    <span class="vital-status normal">Normal</span>
+                                </div>
+                                <div class="vital-card">
+                                    <i class="fas fa-heart"></i>
+                                    <label>Heart Rate</label>
+                                    <p class="vital-value">72 bpm</p>
+                                    <span class="vital-status normal">Normal</span>
+                                </div>
+                                <div class="vital-card">
+                                    <i class="fas fa-weight"></i>
+                                    <label>Weight</label>
+                                    <p class="vital-value">65 kg</p>
+                                    <span class="vital-status normal">Normal</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Billing Tab -->
+                    <div id="billing-tab" class="patient-tab-content">
+                        <div class="billing-records">
+                            <h4><i class="fas fa-file-invoice"></i> Billing Summary</h4>
+                            <div class="billing-stats">
+                                <div class="billing-stat">
+                                    <label>Total Charges</label>
+                                    <p class="amount">₱0.00</p>
+                                </div>
+                                <div class="billing-stat">
+                                    <label>Payments Made</label>
+                                    <p class="amount paid">₱0.00</p>
+                                </div>
+                                <div class="billing-stat">
+                                    <label>Outstanding Balance</label>
+                                    <p class="amount outstanding">₱0.00</p>
+                                </div>
+                            </div>
+                            <h4><i class="fas fa-history"></i> Transaction History</h4>
+                            <div id="billing-history" class="records-list">
+                                <p class="no-data">No billing records</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('patientDetailsModal')">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="editPatientInfo()">
+                        <i class="fas fa-edit"></i> Edit Information
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Task Modal -->
+        <div id="newTaskModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-clipboard-list"></i> Add Medical Task</h2>
+                    <button class="btn-close" onclick="closeModal('newTaskModal')">&times;</button>
+                </div>
+                <form id="taskForm" onsubmit="saveTask(event)">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label><i class="fas fa-tasks"></i> Task Description</label>
+                            <input type="text" name="title" required placeholder="Enter task description...">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-flag"></i> Priority Level</label>
+                                <select name="priority" required>
+                                    <option value="high">🔴 High Priority</option>
+                                    <option value="medium" selected>🟡 Medium Priority</option>
+                                    <option value="low">🟢 Low Priority</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar-day"></i> Due Date</label>
+                                <input type="date" name="dueDate" required>
+                            </div>
+                        </div>
+                        <div class="info-badge">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Tasks help you track important activities and reminders.</span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('newTaskModal')">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check"></i> Add Task
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalsHTML);
+}
+
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+        
+        // Render patients list when opening patients modal
+        if (modalId === 'patientsListModal') {
+            renderPatientsList();
+        }
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = 'none', 300);
+    }
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.classList.remove('show');
+        setTimeout(() => event.target.style.display = 'none', 300);
+    }
+});
+
+// ============================================
+// FORM SUBMISSION HANDLERS
+// ============================================
+
+function saveQuickPatient(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    const currentPatients = JSON.parse(localStorage.getItem('clinikabayan_patients')) || [];
+    let lastId = parseInt(localStorage.getItem('clinikabayan_lastPatientId') || '0');
+    lastId++;
+    
+    const newPatient = {
+        id: `CK-${new Date().getFullYear()}-${String(lastId).padStart(3, '0')}`,
+        firstName: formData.get('firstName'),
+        lastName: formData.get('lastName'),
+        age: parseInt(formData.get('age')),
+        gender: formData.get('gender'),
+        address: formData.get('address'),
+        phone: formData.get('phone'),
+        lastVisit: new Date().toISOString().split('T')[0],
+        status: 'active',
+        condition: formData.get('reason'),
+        registeredDate: new Date().toISOString()
+    };
+    
+    currentPatients.push(newPatient);
+    dashboardData.patients = currentPatients;
+    localStorage.setItem('clinikabayan_patients', JSON.stringify(currentPatients));
+    localStorage.setItem('clinikabayan_lastPatientId', lastId);
+    
+    // Add activity
+    addActivity(`New patient registered: ${newPatient.firstName} ${newPatient.lastName}`, 'user-plus', 'success');
+    
+    form.reset();
+    closeModal('quickPatientModal');
+    updateDashboardStats();
+    showNotification(`Patient ${newPatient.firstName} ${newPatient.lastName} registered successfully! ID: ${newPatient.id}`, 'success');
+}
+
+function saveAppointment(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    const newAppointment = {
+        id: dashboardData.appointments.length + 1,
+        patient: formData.get('patient'),
+        date: formData.get('date'),
+        time: formData.get('time'),
+        type: formData.get('type'),
+        notes: formData.get('notes'),
+        status: 'pending',
+        created: new Date().toISOString()
+    };
+    
+    dashboardData.appointments.push(newAppointment);
+    localStorage.setItem('dashboard_appointments', JSON.stringify(dashboardData.appointments));
+    
+    // Add activity
+    addActivity(`Appointment scheduled for ${newAppointment.patient}`, 'calendar-check', 'primary');
+    
+    form.reset();
+    closeModal('newAppointmentModal');
+    renderAppointments();
+    updateDashboardStats();
+    showNotification('Appointment scheduled successfully!', 'success');
+}
+
+function saveTask(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    const newTask = {
+        id: dashboardData.tasks.length + 1,
+        title: formData.get('title'),
+        priority: formData.get('priority'),
+        dueDate: formData.get('dueDate'),
+        completed: false,
+        created: new Date().toISOString()
+    };
+    
+    dashboardData.tasks.push(newTask);
+    localStorage.setItem('dashboard_tasks', JSON.stringify(dashboardData.tasks));
+    
+    form.reset();
+    closeModal('newTaskModal');
+    renderTasks();
+    showNotification('Task added successfully!', 'success');
+}
+
+function addActivity(description, icon, color) {
+    const activities = JSON.parse(localStorage.getItem('dashboard_activities')) || [];
+    activities.unshift({
+        id: activities.length + 1,
+        description,
+        icon,
+        color,
+        timestamp: new Date().toISOString()
+    });
+    
+    // Keep only last 50 activities
+    if (activities.length > 50) activities.pop();
+    
+    localStorage.setItem('dashboard_activities', JSON.stringify(activities));
+}
+
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existing = document.querySelector('.notification-toast');
+    if (existing) existing.remove();
+    
+    const notification = document.createElement('div');
+    notification.className = `notification-toast ${type}`;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        <span>${message}</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => notification.classList.add('show'), 10);
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// ============================================
+// QUICK ACTIONS
+// ============================================
+
+function quickRegisterPatient() {
+    openModal('quickPatientModal');
+}
+
+function scheduleAppointment() {
+    openModal('newAppointmentModal');
+}
+
+function addTask() {
+    openModal('newTaskModal');
+}
+
+function viewPatientDetails(patientId) {
+    const patients = JSON.parse(localStorage.getItem('clinikabayan_patients')) || [];
+    const patient = patients.find(p => p.id === patientId);
+    
+    if (!patient) {
+        showNotification('Patient not found', 'error');
+        return;
+    }
+    
+    // Populate demographics tab
+    document.getElementById('modal-patient-id').textContent = patient.id;
+    document.getElementById('modal-patient-name').textContent = `${patient.firstName} ${patient.lastName}`;
+    document.getElementById('modal-patient-age').textContent = `${patient.age} years old`;
+    document.getElementById('modal-patient-gender').textContent = patient.gender;
+    document.getElementById('modal-patient-address').textContent = patient.address || 'Not specified';
+    document.getElementById('modal-patient-phone').textContent = patient.phone || 'Not specified';
+    
+    // Calculate DOB from age (approximate)
+    const currentYear = new Date().getFullYear();
+    const birthYear = currentYear - patient.age;
+    document.getElementById('modal-patient-dob').textContent = `Approx. ${birthYear}`;
+    
+    // Registration date
+    if (patient.registeredDate) {
+        const regDate = new Date(patient.registeredDate);
+        document.getElementById('modal-patient-registered').textContent = regDate.toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+    }
+    
+    // Load patient appointments
+    const appointments = dashboardData.appointments.filter(apt => 
+        apt.patient.includes(patient.firstName) || apt.patient.includes(patient.lastName)
+    );
+    
+    const appointmentsList = document.getElementById('patient-appointments-list');
+    if (appointments.length > 0) {
+        appointmentsList.innerHTML = appointments.map(apt => `
+            <div class="record-item">
+                <div class="record-icon ${apt.status}">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <div class="record-content">
+                    <h5>${apt.type}</h5>
+                    <p>${apt.date} at ${apt.time}</p>
+                    <span class="status-badge status-${apt.status}">${apt.status}</span>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        appointmentsList.innerHTML = '<p class="no-data">No appointments scheduled</p>';
+    }
+    
+    // Medical history
+    if (patient.condition) {
+        document.getElementById('medical-conditions').innerHTML = `
+            <div class="record-item">
+                <div class="record-icon">
+                    <i class="fas fa-notes-medical"></i>
+                </div>
+                <div class="record-content">
+                    <h5>Current Condition</h5>
+                    <p>${patient.condition}</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    openModal('patientDetailsModal');
+}
+
+function switchPatientTab(tabName) {
+    // Remove active class from all tabs and contents
+    document.querySelectorAll('.patient-tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.patient-tab-content').forEach(content => content.classList.remove('active'));
+    
+    // Add active class to selected tab and content
+    event.target.classList.add('active');
+    document.getElementById(`${tabName}-tab`).classList.add('active');
+}
+
+function editPatientInfo() {
+    showNotification('Edit functionality coming soon!', 'info');
+    // This would open an edit form modal in a full implementation
+}
+
+function renderPatientsList() {
+    const patients = JSON.parse(localStorage.getItem('clinikabayan_patients')) || [];
+    const container = document.getElementById('patientsListContainer');
+    
+    if (!container) return;
+    
+    if (patients.length === 0) {
+        container.innerHTML = `
+            <div class="no-patients">
+                <i class="fas fa-user-slash"></i>
+                <h4>No Patients Registered</h4>
+                <p>Click "Add New Patient" to register your first patient</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = patients.map(patient => `
+        <div class="patient-card" onclick="closeModal('patientsListModal'); viewPatientDetails('${patient.id}');">
+            <div class="patient-card-header">
+                <div class="patient-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="patient-card-info">
+                    <h4>${patient.firstName} ${patient.lastName}</h4>
+                    <p class="patient-id">${patient.id}</p>
+                </div>
+            </div>
+            <div class="patient-card-details">
+                <div class="detail-item">
+                    <i class="fas fa-birthday-cake"></i>
+                    <span>${patient.age} years old</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-venus-mars"></i>
+                    <span>${patient.gender}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${patient.address || 'No address'}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-phone"></i>
+                    <span>${patient.phone || 'No phone'}</span>
+                </div>
+            </div>
+            <div class="patient-card-footer">
+                <span class="status-badge status-${patient.status || 'active'}">${patient.status || 'Active'}</span>
+                <span class="last-visit">Last: ${patient.lastVisit || 'Never'}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function filterPatientsList() {
+    const searchTerm = document.getElementById('patientSearch').value.toLowerCase();
+    const patients = JSON.parse(localStorage.getItem('clinikabayan_patients')) || [];
+    const container = document.getElementById('patientsListContainer');
+    
+    if (!container) return;
+    
+    const filtered = patients.filter(patient => {
+        const fullName = `${patient.firstName} ${patient.lastName}`.toLowerCase();
+        const id = (patient.id || '').toLowerCase();
+        const address = (patient.address || '').toLowerCase();
+        
+        return fullName.includes(searchTerm) || id.includes(searchTerm) || address.includes(searchTerm);
+    });
+    
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="no-patients">
+                <i class="fas fa-search"></i>
+                <h4>No Patients Found</h4>
+                <p>Try different search terms</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = filtered.map(patient => `
+        <div class="patient-card" onclick="closeModal('patientsListModal'); viewPatientDetails('${patient.id}');">
+            <div class="patient-card-header">
+                <div class="patient-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="patient-card-info">
+                    <h4>${patient.firstName} ${patient.lastName}</h4>
+                    <p class="patient-id">${patient.id}</p>
+                </div>
+            </div>
+            <div class="patient-card-details">
+                <div class="detail-item">
+                    <i class="fas fa-birthday-cake"></i>
+                    <span>${patient.age} years old</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-venus-mars"></i>
+                    <span>${patient.gender}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${patient.address || 'No address'}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-phone"></i>
+                    <span>${patient.phone || 'No phone'}</span>
+                </div>
+            </div>
+            <div class="patient-card-footer">
+                <span class="status-badge status-${patient.status || 'active'}">${patient.status || 'Active'}</span>
+                <span class="last-visit">Last: ${patient.lastVisit || 'Never'}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Export functions for use in HTML onclick handlers
 window.logout = logout;
 window.DashboardUtils = DashboardUtils;
 window.toggleTask = toggleTask;
 window.addNewTask = addNewTask;
+window.toggleTaskCompletion = toggleTaskCompletion;
+window.quickRegisterPatient = quickRegisterPatient;
+window.scheduleAppointment = scheduleAppointment;
+window.addTask = addTask;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.saveQuickPatient = saveQuickPatient;
+window.saveAppointment = saveAppointment;
+window.saveTask = saveTask;
+window.toggleNotifications = toggleNotifications;
+window.markAllAsRead = markAllAsRead;
+window.viewPatientDetails = viewPatientDetails;
+window.switchPatientTab = switchPatientTab;
+window.editPatientInfo = editPatientInfo;
+window.renderPatientsList = renderPatientsList;
+window.filterPatientsList = filterPatientsList;
+
+console.log('Dashboard functions exposed globally');
